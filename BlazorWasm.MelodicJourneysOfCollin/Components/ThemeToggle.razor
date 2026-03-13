@@ -1,0 +1,53 @@
+@inject ThemeService ThemeService
+@inject IJSRuntime JsRuntime
+@implements IDisposable
+
+<button class="theme-toggle" type="button" @onclick="ToggleTheme">
+    <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-accent-soft text-accent">
+        @switch (ThemeService.Preference)
+        {
+            case ThemePreference.Light:
+                <span>LM</span>
+                break;
+            case ThemePreference.Dark:
+                <span>DK</span>
+                break;
+            default:
+                <span>SY</span>
+                break;
+        }
+    </span>
+    <span class="text-left">
+        <span class="block text-xs uppercase tracking-[0.3em] text-muted">Theme</span>
+        <span class="block text-sm font-semibold">@Label</span>
+    </span>
+</button>
+
+@code {
+    private string Label => ThemeService.Preference switch
+    {
+        ThemePreference.Light => "Light mode",
+        ThemePreference.Dark => "Dark mode",
+        _ => ThemeService.IsDark ? "System dark" : "System light"
+    };
+
+    protected override void OnInitialized()
+    {
+        ThemeService.Changed += OnThemeChanged;
+    }
+
+    private async Task ToggleTheme()
+    {
+        await ThemeService.CycleAsync(JsRuntime);
+    }
+
+    private void OnThemeChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        ThemeService.Changed -= OnThemeChanged;
+    }
+}

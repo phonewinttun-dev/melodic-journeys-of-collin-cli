@@ -1,0 +1,29 @@
+@page "/favorites"
+@inject LibraryStateService LibraryState
+
+@{
+    var favorites = LibraryState.GetFavorites();
+}
+
+<div class="space-y-8 md:space-y-10">
+    <section class="surface-panel rounded-[2rem] p-6 md:p-8">
+        <SectionHeader Eyebrow="Saved Library" Title="Favorites" Description="Tracks you heart anywhere in the app are saved in this browser and ready to play again here." />
+    </section>
+
+    @if (favorites.Count == 0)
+    {
+        <section class="surface-panel rounded-[2rem] p-8 text-center">
+            <div class="headline-display text-5xl text-[var(--fg)]">No favorites yet</div>
+            <p class="mt-4 text-sm leading-7 text-muted">Tap the heart on releases, albums, or the player bar to build your quick-access set.</p>
+        </section>
+    }
+    else
+    {
+        <section class="grid gap-4 xl:grid-cols-2">
+            @foreach (var track in favorites)
+            {
+                <TrackCard Track="track" />
+            }
+        </section>
+    }
+</div>

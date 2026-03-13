@@ -1,15 +1,15 @@
-﻿@inject IJSRuntime JsRuntime
+@inject IJSRuntime JsRuntime
 
 @if (MusicInfo != null)
 {
     <div class="player player--active">
         <div class="player__cover">
-            <img src="@MusicInfo.Cover" loading="lazy" alt="…" width="200" height="200">
+            <img src="@MusicInfo.Cover" loading="lazy" alt="..." width="200" height="200">
         </div>
 
         <div class="player__content">
             <span class="player__track">
-                <b class="player__title">@MusicInfo.Name</b> –
+                <b class="player__title">@MusicInfo.Name</b> -
                 <span class="player__artist">@MusicInfo.Artists</span>
             </span>
             <audio src="@MusicInfo.Link?.ToLocalLink()" id="audio" controls></audio>
@@ -18,19 +18,13 @@
 }
 
 @code {
-
     [Parameter]
     public MusicInfoModel? MusicInfo { get; set; }
 
-    private bool _show = false;
-    
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            _show = false;
-            await Task.Delay(TimeSpan.FromMilliseconds(500));
-            _show = true;
             await JsRuntime.InvokeVoidAsync("setPlayer");
         }
     }

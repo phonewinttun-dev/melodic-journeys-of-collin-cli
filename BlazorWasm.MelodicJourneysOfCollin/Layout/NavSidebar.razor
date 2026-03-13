@@ -1,0 +1,50 @@
+<aside class="fixed left-0 top-0 z-50 flex h-full w-20 flex-col items-center border-r-2 border-black bg-[var(--bg)] py-6 dark:border-white">
+    <div class="mb-10 flex h-12 w-12 items-center justify-center rounded-[1rem] border-2 border-black bg-[var(--accent)] text-xl font-black text-white shadow-[4px_4px_0_0_rgba(0,0,0,0.9)] dark:border-white">
+        C
+    </div>
+
+    <nav class="flex flex-1 flex-col gap-5">
+        <NavLink href="/" Match="NavLinkMatch.All" class="nav-icon-link" title="Home">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-6 w-6"><path fill="currentColor" d="M10 20v-6h4v6h5v-8h3L12 3L2 12h3v8h5Z"/></svg>
+        </NavLink>
+        <NavLink href="/releases" class="nav-icon-link" title="Releases">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-6 w-6"><path fill="currentColor" d="M12 3v10.55c-.59-.34-1.27-.55-2-.55c-2.21 0-4 1.79-4 4s1.79 4 4 4s4-1.79 4-4V7h4V3h-6Z"/></svg>
+        </NavLink>
+        <NavLink href="/albums" class="nav-icon-link" title="Albums">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-6 w-6"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2zm0 14.5c-2.49 0-4.5-2.01-4.5-4.5s2.01-4.5 4.5-4.5s4.5 2.01 4.5 4.5s-2.01 4.5-4.5 4.5z"/><path fill="currentColor" d="M12 10c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2z"/></svg>
+        </NavLink>
+        <NavLink href="/favorites" class="nav-icon-link" title="Favorites">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-6 w-6"><path fill="currentColor" d="m12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5C2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35Z"/></svg>
+        </NavLink>
+        <NavLink href="/dj" class="nav-icon-link" title="DJ Room">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-6 w-6"><path fill="currentColor" d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm0 2.2A7.8 7.8 0 1 1 4.2 12 7.81 7.81 0 0 1 12 4.2Zm0 2.8a5 5 0 1 0 5 5 5 5 0 0 0-5-5Zm0 2.2A2.8 2.8 0 1 1 9.2 12 2.8 2.8 0 0 1 12 9.2Z"/></svg>
+        </NavLink>
+        <NavLink href="/profile" class="nav-icon-link" title="Profile">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-6 w-6"><path fill="currentColor" d="M12 12c2.76 0 5-2.24 5-5S14.76 2 12 2S7 4.24 7 7s2.24 5 5 5Zm0 2c-3.33 0-10 1.67-10 5v3h20v-3c0-3.33-6.67-5-10-5Z"/></svg>
+        </NavLink>
+        <NavLink href="/about-us" class="nav-icon-link" title="About">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-6 w-6"><path fill="currentColor" d="M11 9h2V7h-2m1 13c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8m-1-3h2v-6h-2v6Z"/></svg>
+        </NavLink>
+    </nav>
+</aside>
+
+<style>
+    .nav-icon-link {
+        display: flex;
+        height: 2.75rem;
+        width: 2.75rem;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.9rem;
+        border: 2px solid transparent;
+        color: var(--muted);
+        transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .nav-icon-link:hover,
+    .nav-icon-link.active {
+        background: var(--accent-soft);
+        color: var(--accent);
+        border-color: var(--fg);
+    }
+</style>

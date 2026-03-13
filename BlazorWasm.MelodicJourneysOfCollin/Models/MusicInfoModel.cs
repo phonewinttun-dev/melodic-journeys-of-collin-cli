@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace BlazorWasm.MelodicJourneysOfCollin.Models
 {
@@ -12,12 +12,17 @@ namespace BlazorWasm.MelodicJourneysOfCollin.Models
         public string? Cover { get; set; }
         public int PlatformType { get; set; }
         public string? Length { get; set; }
-        public List<DownloadLinkModel> DownloadLinks { get; set; }
+        public string? AlbumId { get; set; }
+        public string? AlbumTitle { get; set; }
+        public string? AlbumCover { get; set; }
+        public string? AlbumArtist { get; set; }
+        public int? TrackNumber { get; set; }
+        public List<DownloadLinkModel> DownloadLinks { get; set; } = new();
     }
-    
+
     public class DownloadLinkModel
     {
-        public string PlatformType { get; set; }
-        public string DownloadLink { get; set; }
+        public string? PlatformType { get; set; }
+        public string? DownloadLink { get; set; }
     }
 }

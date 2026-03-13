@@ -1,12 +1,53 @@
-﻿@page "/about-us"
-<!-- title -->
-<div class="col-12">
-    <div class="main__title">
-        <h1>About Us</h1>
+@page "/about-us"
 
-        <p>We are a dedicated team of music enthusiasts and professionals who are passionate about supporting and promoting artists in the electronic music industry. Our goal is to provide a platform for talented artists like Collin to showcase their music and connect with a global audience.
-           
-           Through our extensive network and industry expertise, we curate and promote a wide range of electronic music genres, including bigroom, progressive house, future house, and tropical house. We believe in the power of music to inspire, uplift, and unite people from all walks of life, and we strive to bring exceptional music to the forefront.</p>
-    </div>
+<div class="space-y-8 md:space-y-10">
+    <section class="surface-panel rope-border rounded-[2rem] p-6 md:p-8">
+        <SectionHeader Eyebrow="About The Voyage" Title="An artist site rebuilt like a sea-worn listening room" Description="This redesign reframes Collin's catalog as an immersive story space: part festival archive, part warm analog control booth, part fan-facing home base." />
+        <div class="mt-8 grid gap-6 lg:grid-cols-3">
+            <div class="rounded-[1.5rem] border border-theme bg-accent-soft p-5">
+                <div class="text-xs uppercase tracking-[0.35em] text-muted">Vision</div>
+                <p class="mt-4 text-sm leading-7 text-[var(--fg)]">Put the music first, then wrap it in a memorable atmosphere that feels focused, tactile, and unmistakably handcrafted.</p>
+            </div>
+            <div class="rounded-[1.5rem] border border-theme bg-accent-soft p-5">
+                <div class="text-xs uppercase tracking-[0.35em] text-muted">Aesthetic</div>
+                <p class="mt-4 text-sm leading-7 text-[var(--fg)]">A single scarlet accent, restrained neutrals, metallic controls, and layered surfaces instead of a scattered multi-color palette.</p>
+            </div>
+            <div class="rounded-[1.5rem] border border-theme bg-black/5 p-5 dark:bg-white/5">
+                <div class="text-xs uppercase tracking-[0.35em] text-muted">Experience</div>
+                <p class="mt-4 text-sm leading-7 text-[var(--fg)]">A routed Blazor app with a persistent top player, reusable card primitives, and theme state that survives refreshes across the whole site.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+        <div class="surface-panel rope-border rounded-[2rem] p-6 md:p-8">
+            <div class="section-label">Story</div>
+            <div class="mt-6 space-y-5 text-sm leading-8 text-muted md:text-base">
+                <p>Collin's catalog lives in the overlap between festival energy and melodic sentimentality. That balance is what shaped the new information architecture: fast access to tracks, a player that feels tactile, and supporting pages that give the artist narrative room to breathe.</p>
+                <p>The site now behaves like a proper artist hub instead of a transplanted template. Routing is conventional, the design system is shared across pages, and the player state belongs to the app instead of a one-off layout switch statement.</p>
+                <p>Light and dark mode are both first-class. The bright theme keeps surfaces clean and bright while the dark theme shifts the same system into a late-night booth, both anchored by the same #AC0808 accent.</p>
+            </div>
+        </div>
+
+        <div class="surface-panel rope-border rounded-[2rem] p-6 md:p-8">
+            <div class="section-label">What Changed</div>
+            <div class="mt-6 space-y-4">
+                <div class="rounded-[1.5rem] border border-theme px-4 py-4">
+                    <div class="text-xs uppercase tracking-[0.35em] text-accent">Tailwind Foundation</div>
+                    <p class="mt-2 text-sm leading-7 text-muted">The app now has a real Tailwind build path and a single compiled stylesheet instead of a stack of legacy vendor CSS files.</p>
+                </div>
+                <div class="rounded-[1.5rem] border border-theme px-4 py-4">
+                    <div class="text-xs uppercase tracking-[0.35em] text-accent">Shared Mixer State</div>
+                    <p class="mt-2 text-sm leading-7 text-muted">The top player and DJ room share one playback state, so queue, track metadata, timeline, and volume stay in sync across routes.</p>
+                </div>
+                <div class="rounded-[1.5rem] border border-theme px-4 py-4">
+                    <div class="text-xs uppercase tracking-[0.35em] text-accent">Content-Led Pages</div>
+                    <p class="mt-2 text-sm leading-7 text-muted">Home, releases, profile, and about now each have distinct jobs instead of all inheriting the same template furniture.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
-<!-- end title -->
+
+
+

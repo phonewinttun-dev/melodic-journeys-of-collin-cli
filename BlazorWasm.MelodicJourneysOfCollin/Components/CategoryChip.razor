@@ -1,0 +1,8 @@
+<button class="px-6 py-2 border-2 border-black dark:border-white rounded-full font-display text-2xl transition @(Active ? "bg-black text-white dark:bg-white dark:text-black shadow-none translate-x-1 translate-y-1" : "bg-[var(--bg-elevated)] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1")">
+    @Label
+</button>
+
+@code {
+    [Parameter] public string Label { get; set; } = "";
+    [Parameter] public bool Active { get; set; }
+}

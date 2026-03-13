@@ -1,20 +1,96 @@
-﻿@page "/"
-@code{
+@page "/"
+@inject PlayerStateService PlayerState
+@inject LibraryStateService LibraryState
 
-    private MusicInfoModel MusicInfo;
-    
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            
-        }
-    }
+@{
+    var tracks = MusicService.LocalPlaylist;
+    var featuredTrack = tracks.First();
+    var quickPicks = tracks.Take(6).ToList();
+    var favorites = LibraryState.GetFavorites().Take(4).ToList();
+}
 
-    private void Play(MusicInfoModel musicInfo)
-    {
-        MusicInfo = musicInfo;
-        StateHasChanged();
-    }
+<div class="space-y-8 md:space-y-10">
+    <section class="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+        <div class="surface-panel rounded-[2rem] p-6 md:p-8">
+            <div class="section-label">Now Broadcasting</div>
+            <div class="mt-6 grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
+                <div class="space-y-5">
+                    <h1 class="headline-display max-w-3xl text-6xl leading-[0.88] text-[var(--fg)] md:text-7xl">Play everything from one top bar, then step into the DJ room when you want the full deck.</h1>
+                    <p class="max-w-2xl text-base leading-8 text-muted md:text-lg">Every page can launch tracks instantly now. The compact player stays with you across the site, while the dedicated DJ route turns the same library into a stronger, theatrical mixer experience.</p>
+                    <div class="flex flex-wrap gap-3">
+                        <button class="inline-flex items-center justify-center rounded-full border-2 border-black bg-[var(--accent)] px-6 py-3 text-sm font-semibold uppercase tracking-[0.28em] text-white shadow-[4px_4px_0_0_rgba(0,0,0,0.9)] transition hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none dark:border-white" type="button" @onclick="() => PlayerState.PlayTrack(featuredTrack)">Play Featured</button>
+                        <a href="/dj" class="inline-flex items-center justify-center rounded-full border-2 border-black bg-[var(--bg)] px-6 py-3 text-sm font-semibold uppercase tracking-[0.28em] text-[var(--fg)] transition hover:bg-accent-soft dark:border-white">Open DJ Room</a>
+                        <a href="/albums" class="inline-flex items-center justify-center rounded-full border-2 border-black bg-[var(--bg)] px-6 py-3 text-sm font-semibold uppercase tracking-[0.28em] text-[var(--fg)] transition hover:bg-accent-soft dark:border-white">Browse Albums</a>
+                    </div>
+                </div>
 
+                <div class="rounded-[1.75rem] border-2 border-black bg-[var(--bg)] p-5 shadow-[4px_4px_0_0_rgba(0,0,0,0.9)] dark:border-white">
+                    <div class="flex items-center justify-between text-xs uppercase tracking-[0.35em] text-muted">
+                        <span>Spotlight</span>
+                        <span>@featuredTrack.Length</span>
+                    </div>
+                    <div class="mt-5 flex items-center gap-4">
+                        <img src="@featuredTrack.Cover" alt="@featuredTrack.Name" class="h-28 w-28 rounded-[1.5rem] border-2 border-black object-cover dark:border-white" />
+                        <div class="min-w-0">
+                            <div class="text-xs uppercase tracking-[0.35em] text-accent">Featured Release</div>
+                            <h2 class="mt-2 font-display text-4xl text-[var(--fg)]">@DisplayName(featuredTrack)</h2>
+                            <p class="mt-2 text-sm text-muted">@featuredTrack.Artists</p>
+                            <p class="mt-3 text-sm leading-7 text-muted">The top player keeps this track live while you explore releases, albums, favorites, and the full DJ room.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid gap-6">
+            <div class="surface-panel rounded-[2rem] p-6">
+                <div class="section-label">Library Pulse</div>
+                <div class="mt-6 grid gap-4 sm:grid-cols-3 xl:grid-cols-1">
+                    <div class="rounded-[1.5rem] border-2 border-black bg-accent-soft p-4 dark:border-white">
+                        <div class="text-xs uppercase tracking-[0.35em] text-muted">Tracks</div>
+                        <div class="mt-3 headline-display text-5xl text-[var(--fg)]">@tracks.Count</div>
+                    </div>
+                    <div class="rounded-[1.5rem] border-2 border-black bg-[var(--bg)] p-4 dark:border-white">
+                        <div class="text-xs uppercase tracking-[0.35em] text-muted">Favorites</div>
+                        <div class="mt-3 headline-display text-5xl text-[var(--fg)]">@LibraryState.GetFavorites().Count</div>
+                    </div>
+                    <div class="rounded-[1.5rem] border-2 border-black bg-[var(--bg)] p-4 dark:border-white">
+                        <div class="text-xs uppercase tracking-[0.35em] text-muted">Albums</div>
+                        <div class="mt-3 headline-display text-5xl text-[var(--fg)]">@LibraryState.Albums.Count</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="surface-panel rounded-[2rem] p-6">
+                <div class="section-label">Saved Picks</div>
+                <div class="mt-4 space-y-3">
+                    @if (favorites.Count == 0)
+                    {
+                        <div class="rounded-[1.5rem] border-2 border-dashed border-black px-4 py-5 text-sm text-muted dark:border-white">Start tapping hearts on any track and your favorites will show up here.</div>
+                    }
+                    else
+                    {
+                        @foreach (var track in favorites)
+                        {
+                            <TrackCard Track="track" />
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="surface-panel rounded-[2rem] p-6 md:p-8">
+        <SectionHeader Eyebrow="Quick Launch" Title="Play from anywhere" Description="These cards use the same shared player state as releases, favorites, albums, and the DJ room." />
+        <div class="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            @foreach (var track in quickPicks)
+            {
+                <TrackCard Track="track" />
+            }
+        </div>
+    </section>
+</div>
+
+@code {
+    private static string DisplayName(MusicInfoModel track) => (track.Name ?? string.Empty).Replace(".mp3", string.Empty, StringComparison.OrdinalIgnoreCase);
 }

@@ -1,0 +1,93 @@
+@using Microsoft.JSInterop
+@implements IDisposable
+@inject PlayerStateService PlayerState
+@inject IJSRuntime JsRuntime
+
+<audio @ref="_audioRef" preload="metadata" class="hidden"></audio>
+
+@code {
+    private ElementReference _audioRef;
+    private DotNetObjectReference<GlobalAudioHost>? _dotNetReference;
+    private string? _loadedTrack;
+    private double _lastVolume = -1;
+    private bool? _lastPlaying;
+    private int _lastSeekToken;
+
+    protected override void OnInitialized()
+    {
+        PlayerState.Changed += OnPlayerStateChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _dotNetReference = DotNetObjectReference.Create(this);
+            await JsRuntime.InvokeVoidAsync("collinPlayer.init", _audioRef, _dotNetReference);
+        }
+
+        if (PlayerState.CurrentTrack?.Link is { } link && _loadedTrack != link)
+        {
+            _loadedTrack = link;
+            await JsRuntime.InvokeVoidAsync("collinPlayer.setSource", _audioRef, link.ToLocalLink(), PlayerState.IsPlaying);
+            _lastPlaying = PlayerState.IsPlaying;
+        }
+        else if (_lastPlaying != PlayerState.IsPlaying && PlayerState.CurrentTrack is not null)
+        {
+            _lastPlaying = PlayerState.IsPlaying;
+            if (PlayerState.IsPlaying)
+            {
+                await JsRuntime.InvokeVoidAsync("collinPlayer.play", _audioRef);
+            }
+            else
+            {
+                await JsRuntime.InvokeVoidAsync("collinPlayer.pause", _audioRef);
+            }
+        }
+
+        if (Math.Abs(_lastVolume - PlayerState.Volume) > 0.001)
+        {
+            _lastVolume = PlayerState.Volume;
+            await JsRuntime.InvokeVoidAsync("collinPlayer.setVolume", _audioRef, PlayerState.Volume);
+        }
+
+        if (_lastSeekToken != PlayerState.SeekRequestToken)
+        {
+            _lastSeekToken = PlayerState.SeekRequestToken;
+            await JsRuntime.InvokeVoidAsync("collinPlayer.seek", _audioRef, PlayerState.RequestedSeekTime);
+        }
+    }
+
+    private void OnPlayerStateChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    [JSInvokable]
+    public Task HandleTimelineChanged(double currentTime, double duration, bool isPlaying, double volume)
+    {
+        PlayerState.SetTimeline(currentTime, duration);
+        if (PlayerState.IsPlaying != isPlaying)
+        {
+            PlayerState.SetPlaybackState(isPlaying);
+        }
+        if (Math.Abs(PlayerState.Volume - volume) > 0.001)
+        {
+            PlayerState.SetVolume(volume);
+        }
+        return Task.CompletedTask;
+    }
+
+    [JSInvokable]
+    public Task HandleEnded()
+    {
+        PlayerState.PlayNext();
+        return Task.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        PlayerState.Changed -= OnPlayerStateChanged;
+        _dotNetReference?.Dispose();
+    }
+}

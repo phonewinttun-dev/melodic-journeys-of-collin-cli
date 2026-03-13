@@ -1,0 +1,128 @@
+@inject PlayerStateService PlayerState
+@inject LibraryStateService LibraryState
+
+<div class="space-y-3">
+    <div class="surface-panel rounded-[1.5rem] px-4 py-4 md:px-5">
+        <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+            <div class="flex min-w-0 items-center gap-4 xl:w-[28%]">
+                <div class="h-14 w-14 shrink-0 overflow-hidden rounded-[1rem] border-2 border-black bg-black dark:border-white">
+                    @if (PlayerState.CurrentTrack is not null)
+                    {
+                        <img src="@PlayerState.CurrentTrack.Cover" alt="@PlayerState.CurrentTrack.Name" class="h-full w-full object-cover" />
+                    }
+                </div>
+                <div class="min-w-0">
+                    <div class="text-[0.62rem] font-semibold uppercase tracking-[0.35em] text-accent">Always On</div>
+                    <div class="truncate font-display text-3xl text-[var(--fg)]">@TrackTitle</div>
+                    <div class="truncate text-sm text-muted">@TrackArtist</div>
+                </div>
+            </div>
+
+            <div class="flex flex-1 flex-col gap-3 xl:px-6">
+                <div class="flex items-center justify-center gap-3">
+                    <button class="inline-flex h-10 w-10 items-center justify-center rounded-full border-2 border-black bg-[var(--bg)] text-[var(--fg)] transition hover:bg-accent-soft dark:border-white" type="button" @onclick="PlayerState.PlayPrevious" aria-label="Previous track">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5 fill-current"><path d="M7 5a1 1 0 0 1 1 1v12a1 1 0 1 1-2 0V6a1 1 0 0 1 1-1Zm3.2 7.8V11.2L18.4 6c.67-.42 1.6.06 1.6.85v10.3c0 .8-.93 1.27-1.6.85l-8.2-5.2Z"/></svg>
+                    </button>
+                    <button class="inline-flex h-14 w-14 items-center justify-center rounded-full border-2 border-black bg-[var(--accent)] text-white shadow-[4px_4px_0_0_rgba(0,0,0,0.9)] transition hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none dark:border-white" type="button" @onclick="PlayerState.TogglePlayback" aria-label="Toggle playback">
+                        @if (PlayerState.IsPlaying)
+                        {
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-6 w-6 fill-current"><path d="M7 5.75A1.75 1.75 0 0 1 8.75 4h.5A1.75 1.75 0 0 1 11 5.75v12.5A1.75 1.75 0 0 1 9.25 20h-.5A1.75 1.75 0 0 1 7 18.25V5.75Zm6 0A1.75 1.75 0 0 1 14.75 4h.5A1.75 1.75 0 0 1 17 5.75v12.5A1.75 1.75 0 0 1 15.25 20h-.5A1.75 1.75 0 0 1 13 18.25V5.75Z"/></svg>
+                        }
+                        else
+                        {
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-6 w-6 fill-current"><path d="M8.75 4.2A1.75 1.75 0 0 0 6 5.65v12.7a1.75 1.75 0 0 0 2.75 1.45l9.3-6.35a1.75 1.75 0 0 0 0-2.9L8.75 4.2Z"/></svg>
+                        }
+                    </button>
+                    <button class="inline-flex h-10 w-10 items-center justify-center rounded-full border-2 border-black bg-[var(--bg)] text-[var(--fg)] transition hover:bg-accent-soft dark:border-white" type="button" @onclick="PlayerState.PlayNext" aria-label="Next track">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5 fill-current"><path d="M17 5a1 1 0 0 1 1 1v12a1 1 0 1 1-2 0V6a1 1 0 0 1 1-1ZM5.6 6c-.67-.42-1.6.06-1.6.85v10.3c0 .8.93 1.27 1.6.85l8.2-5.2v-1.6L5.6 6Z" transform="translate(2.2 0)"/></svg>
+                    </button>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-muted">
+                        <span>@FormatTime(PlayerState.CurrentTime)</span>
+                        <span>@FormatTime(PlayerState.Duration)</span>
+                    </div>
+                    <input class="mix-slider w-full" type="range" min="0" max="@(Math.Max(PlayerState.Duration, 1))" step="0.1" value="@PlayerState.CurrentTime" @oninput="SeekTrack" />
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 xl:w-[32%] xl:flex-wrap xl:justify-end">
+                @if (PlayerState.CurrentTrack is not null)
+                {
+                    <FavoriteButton Track="PlayerState.CurrentTrack" Class="inline-flex h-10 items-center justify-center gap-2 rounded-full border-2 border-black bg-[var(--bg)] px-4 text-sm font-semibold uppercase tracking-[0.2em] text-accent transition hover:bg-accent-soft dark:border-white" />
+                }
+                <a href="/dj" class="inline-flex h-10 items-center justify-center rounded-full border-2 border-black bg-[var(--bg)] px-4 text-sm font-semibold uppercase tracking-[0.2em] text-[var(--fg)] transition hover:bg-accent-soft dark:border-white">DJ Room</a>
+                <button class="inline-flex h-10 items-center justify-center rounded-full border-2 border-black bg-[var(--bg)] px-4 text-sm font-semibold uppercase tracking-[0.2em] text-[var(--fg)] transition hover:bg-accent-soft dark:border-white" type="button" @onclick="PlayerState.TogglePlaylist">Queue @PlayerState.Queue.Count</button>
+                <div class="flex items-center gap-2 rounded-full border-2 border-black bg-[var(--bg)] px-4 py-2 dark:border-white">
+                    <span class="text-[0.68rem] font-semibold uppercase tracking-[0.28em] text-muted">Vol</span>
+                    <input class="mix-slider w-24" type="range" min="0" max="1" step="0.01" value="@PlayerState.Volume" @oninput="SetVolume" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (PlayerState.IsPlaylistOpen)
+    {
+        <div class="surface-panel rounded-[1.5rem] px-4 py-4 md:px-5">
+            <div class="mb-4 flex items-center justify-between gap-4">
+                <div>
+                    <div class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-accent">Queue</div>
+                    <div class="text-sm text-muted">Play any track from the shared crate and keep moving through the site.</div>
+                </div>
+                <button class="inline-flex h-10 w-10 items-center justify-center rounded-full border-2 border-black bg-[var(--bg)] text-[var(--fg)] transition hover:bg-accent-soft dark:border-white" type="button" @onclick="PlayerState.ClosePlaylist" aria-label="Close queue">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5 fill-current"><path d="M6.97 5.56a1 1 0 0 1 1.41 0L12 9.17l3.62-3.61a1 1 0 1 1 1.41 1.41L13.41 10.6l3.62 3.61a1 1 0 0 1-1.41 1.42L12 12l-3.62 3.62a1 1 0 1 1-1.41-1.42l3.62-3.61-3.62-3.63a1 1 0 0 1 0-1.4Z"/></svg>
+                </button>
+            </div>
+            <div class="grid gap-3 lg:grid-cols-2">
+                @for (var i = 0; i < PlayerState.Queue.Count; i++)
+                {
+                    var track = PlayerState.Queue[i];
+                    var isCurrent = string.Equals(PlayerState.CurrentTrack?.Link, track.Link, StringComparison.OrdinalIgnoreCase);
+                    <button class="flex items-center gap-3 rounded-[1.2rem] border-2 border-black px-4 py-3 text-left transition @(isCurrent ? "bg-accent-soft text-accent" : "bg-[var(--bg)] text-[var(--fg)] hover:bg-accent-soft") dark:border-white" type="button" @onclick="() => PlayerState.PlayTrackAt(i)">
+                        <div class="text-xs font-semibold uppercase tracking-[0.3em] text-muted">@((i + 1).ToString("00"))</div>
+                        <img src="@track.Cover" alt="@track.Name" class="h-12 w-12 rounded-xl object-cover" />
+                        <div class="min-w-0 flex-1">
+                            <div class="truncate font-display text-2xl">@DisplayName(track)</div>
+                            <div class="truncate text-xs text-muted">@track.Artists</div>
+                        </div>
+                        <FavoriteButton Track="track" />
+                    </button>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private string TrackTitle => PlayerState.CurrentTrack is null ? "Select a track" : DisplayName(PlayerState.CurrentTrack);
+    private string TrackArtist => PlayerState.CurrentTrack?.Artists ?? "Collin";
+
+    private void SetVolume(ChangeEventArgs args)
+    {
+        if (double.TryParse(args.Value?.ToString(), out var value))
+        {
+            PlayerState.SetVolume(value);
+        }
+    }
+
+    private void SeekTrack(ChangeEventArgs args)
+    {
+        if (double.TryParse(args.Value?.ToString(), out var value))
+        {
+            PlayerState.RequestSeek(value);
+        }
+    }
+
+    private static string FormatTime(double seconds)
+    {
+        if (seconds <= 0)
+        {
+            return "00:00";
+        }
+
+        var time = TimeSpan.FromSeconds(seconds);
+        return time.TotalHours >= 1 ? $"{(int)time.TotalHours:00}:{time.Minutes:00}:{time.Seconds:00}" : $"{time.Minutes:00}:{time.Seconds:00}";
+    }
+
+    private static string DisplayName(MusicInfoModel track) => (track.Name ?? string.Empty).Replace(".mp3", string.Empty, StringComparison.OrdinalIgnoreCase);
+}

@@ -1,4 +1,4 @@
-﻿using BlazorWasm.MelodicJourneysOfCollin.Models;
+using BlazorWasm.MelodicJourneysOfCollin.Models;
 using Newtonsoft.Json;
 using System.Text.Json.Serialization;
 
@@ -6,15 +6,45 @@ namespace BlazorWasm.MelodicJourneysOfCollin.Services
 {
     public static class MusicService
     {
+        private static readonly Lazy<List<MusicInfoModel>> _localPlaylist = new(() =>
+        {
+            var tracks = GetMusicPlayList<MusicInfoModel>(JsonData.LocalPlaylist);
+            AnnotateAlbums(tracks);
+            return tracks;
+        });
+
+        private static readonly Lazy<IReadOnlyList<AlbumCollectionModel>> _albums = new(() =>
+            _localPlaylist.Value
+                .Where(track => !string.IsNullOrWhiteSpace(track.AlbumId))
+                .GroupBy(track => track.AlbumId, StringComparer.OrdinalIgnoreCase)
+                .Select(group =>
+                {
+                    var orderedTracks = group.OrderBy(track => track.TrackNumber ?? int.MaxValue).ThenBy(track => track.Name).ToList();
+                    var first = orderedTracks[0];
+                    return new AlbumCollectionModel
+                    {
+                        Id = first.AlbumId ?? string.Empty,
+                        Title = first.AlbumTitle ?? "Unsorted Collection",
+                        Artist = first.AlbumArtist ?? first.Artists ?? "Collin",
+                        Cover = first.AlbumCover ?? first.Cover ?? string.Empty,
+                        Tracks = orderedTracks
+                    };
+                })
+                .OrderBy(album => album.Title)
+                .ToList());
+
         public static string ToLocalLink(this string str)
         {
             return $"music/{str}";
         }
-        
-        public static List<MusicInfoModel> LocalPlaylist =>
-	        GetMusicPlayList<MusicInfoModel>(JsonData.LocalPlaylist)
-		        .ToList();
-        
+
+        public static List<MusicInfoModel> LocalPlaylist => _localPlaylist.Value;
+
+        public static IReadOnlyList<AlbumCollectionModel> Albums => _albums.Value;
+
+        public static AlbumCollectionModel? GetAlbum(string albumId)
+            => Albums.FirstOrDefault(album => string.Equals(album.Id, albumId, StringComparison.OrdinalIgnoreCase));
+
         public static List<MusicInfoModel> SoundCloundPlaylist =>
                                     GetMusicPlayList<MusicInfoModel>(JsonData.MusicList)
                                      .Where(x => x.PlatformType == (int)EnumMusicPlatformType.SoundCloud)
@@ -31,33 +61,71 @@ namespace BlazorWasm.MelodicJourneysOfCollin.Services
                                      GetMusicPlayList<KrakenFilesPlaylistModel>(JsonData.MusicList)
                                      .Where(x => x.PlatformType == (int)EnumMusicPlatformType.KrakenFiles)
                                      .ToList();
-        //public static List<FavoriteSongListModel> FavoriteSongList =>
-        //                             GetMusicPlayList<FavoriteSongListModel>(JsonData.MusicList)
-        //                             .Where(x => x.PlatformType == (int)EnumMusicPlatformType.KrakenFiles)
-        //                             .ToList();
+
         public static List<T> GetMusicPlayList<T>(string json)
         {
             var list = json.ToObject<List<T>>();
-            return list;
+            return list ?? new List<T>();
         }
 
-        public static MusicReleasePaginationModel releaseListPagination(int pageNo = 1 , int pageSize = 4)
+        public static MusicReleasePaginationModel releaseListPagination(int pageNo = 1, int pageSize = 4)
         {
             int count = LocalPlaylist.Count;
-            int totalPage = count / pageSize;
-            if(count % totalPage == 0)
+            int totalPage = Math.Max(1, (int)Math.Ceiling(count / (double)pageSize));
+            var result = LocalPlaylist.Skip((pageNo - 1) * pageSize).Take(pageSize).ToList();
+            return new MusicReleasePaginationModel
             {
-                totalPage++;
-            }
-            var result = LocalPlaylist.Skip((pageNo-1) * pageSize).Take(pageSize).ToList();
-            return new MusicReleasePaginationModel {
                 musicList = result,
-               // musicList = result,
                 totalPage = totalPage,
             };
         }
-    }
 
+        private static void AnnotateAlbums(List<MusicInfoModel> tracks)
+        {
+            foreach (var track in tracks)
+            {
+                var title = (track.Name ?? string.Empty).Replace(".mp3", string.Empty, StringComparison.OrdinalIgnoreCase);
+                if (title.Contains("Day 1", StringComparison.OrdinalIgnoreCase) || title.Contains("Day 2", StringComparison.OrdinalIgnoreCase) || title.Contains("Day 3", StringComparison.OrdinalIgnoreCase) || title.Contains("Day 4", StringComparison.OrdinalIgnoreCase))
+                {
+                    AssignAlbum(track, "day-series", "Day Series", "Collin");
+                    continue;
+                }
+
+                if (title.Contains("Remix", StringComparison.OrdinalIgnoreCase) || title.Contains("Edit", StringComparison.OrdinalIgnoreCase))
+                {
+                    AssignAlbum(track, "festival-remixes", "Festival Remixes", "Collin");
+                    continue;
+                }
+
+                if ((track.Artists ?? string.Empty).Contains("&", StringComparison.OrdinalIgnoreCase) ||
+                    (track.Artists ?? string.Empty).Contains(" x ", StringComparison.OrdinalIgnoreCase) ||
+                    title.Contains(" x ", StringComparison.OrdinalIgnoreCase))
+                {
+                    AssignAlbum(track, "collaboration-cuts", "Collaboration Cuts", track.Artists ?? "Collin");
+                    continue;
+                }
+
+                AssignAlbum(track, "after-hours-singles", "After Hours Singles", "Collin");
+            }
+
+            foreach (var album in tracks.GroupBy(track => track.AlbumId, StringComparer.OrdinalIgnoreCase))
+            {
+                var ordered = album.OrderBy(track => track.Id).ThenBy(track => track.Name).ToList();
+                for (var i = 0; i < ordered.Count; i++)
+                {
+                    ordered[i].TrackNumber = i + 1;
+                }
+            }
+        }
+
+        private static void AssignAlbum(MusicInfoModel track, string albumId, string title, string artist)
+        {
+            track.AlbumId = albumId;
+            track.AlbumTitle = title;
+            track.AlbumArtist = artist;
+            track.AlbumCover = track.Cover;
+        }
+    }
     public static class JsonData
     {
         public static string MusicList { get; } = @"[
@@ -1921,3 +1989,4 @@ namespace BlazorWasm.MelodicJourneysOfCollin.Services
 ]";
     }
 }
+

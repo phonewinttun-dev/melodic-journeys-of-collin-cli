@@ -1,0 +1,61 @@
+@page "/albums/{AlbumId}"
+@inject PlayerStateService PlayerState
+@inject LibraryStateService LibraryState
+
+@{
+    var album = LibraryState.GetAlbum(AlbumId);
+}
+
+@if (album is null)
+{
+    <div class="surface-panel rounded-[2rem] p-8 text-center">
+        <div class="headline-display text-5xl text-[var(--fg)]">Album not found</div>
+        <p class="mt-4 text-sm text-muted">This album route does not match any curated collection in the current library.</p>
+    </div>
+}
+else
+{
+    <div class="space-y-8 md:space-y-10">
+        <section class="surface-panel rounded-[2rem] p-6 md:p-8">
+            <div class="grid gap-6 lg:grid-cols-[300px_1fr] lg:items-end">
+                <img src="@album.Cover" alt="@album.Title" class="w-full max-w-[300px] rounded-[2rem] border-2 border-black object-cover dark:border-white" />
+                <div class="space-y-4">
+                    <div class="section-label">Album Detail</div>
+                    <h1 class="headline-display text-6xl text-[var(--fg)] md:text-7xl">@album.Title</h1>
+                    <p class="text-sm uppercase tracking-[0.35em] text-muted">@album.Artist · @album.Tracks.Count tracks</p>
+                    <div class="flex flex-wrap gap-3">
+                        <button class="inline-flex items-center justify-center rounded-full border-2 border-black bg-[var(--accent)] px-6 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-white shadow-[4px_4px_0_0_rgba(0,0,0,0.9)] transition hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none dark:border-white" type="button" @onclick="() => PlayerState.PlayQueue(album.Tracks)">Play All</button>
+                        <a href="/albums" class="inline-flex items-center justify-center rounded-full border-2 border-black bg-[var(--bg)] px-6 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-[var(--fg)] transition hover:bg-accent-soft dark:border-white">Back to Albums</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="grid gap-4 xl:grid-cols-2">
+            @for (var i = 0; i < album.Tracks.Count; i++)
+            {
+                var track = album.Tracks[i];
+                <div class="surface-panel rounded-[1.5rem] p-4">
+                    <div class="flex items-center gap-4">
+                        <div class="headline-display text-3xl text-accent">@((track.TrackNumber ?? (i + 1)).ToString("00"))</div>
+                        <img src="@track.Cover" alt="@track.Name" class="h-16 w-16 rounded-[1rem] border-2 border-black object-cover dark:border-white" />
+                        <div class="min-w-0 flex-1">
+                            <div class="truncate font-display text-3xl text-[var(--fg)]">@DisplayName(track)</div>
+                            <div class="truncate text-sm text-muted">@track.Artists</div>
+                        </div>
+                        <FavoriteButton Track="track" />
+                        <button class="inline-flex h-10 w-10 items-center justify-center rounded-full border-2 border-black bg-[var(--accent)] text-white dark:border-white" type="button" @onclick="() => PlayerState.PlayQueue(album.Tracks, i)">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5 fill-current"><path d="M8 5v14l11-7z"/></svg>
+                        </button>
+                    </div>
+                </div>
+            }
+        </section>
+    </div>
+}
+
+@code {
+    [Parameter] public string AlbumId { get; set; } = string.Empty;
+
+    private static string DisplayName(MusicInfoModel track) => (track.Name ?? string.Empty).Replace(".mp3", string.Empty, StringComparison.OrdinalIgnoreCase);
+}

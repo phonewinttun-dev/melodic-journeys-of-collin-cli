@@ -1,0 +1,31 @@
+<div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+    <div class="space-y-3">
+        @if (!string.IsNullOrWhiteSpace(Eyebrow))
+        {
+            <div class="section-label">@Eyebrow</div>
+        }
+
+        <div class="space-y-2">
+            <h2 class="headline-display text-4xl uppercase leading-none tracking-[0.08em] text-[var(--fg)] md:text-5xl">@Title</h2>
+            @if (!string.IsNullOrWhiteSpace(Description))
+            {
+                <p class="max-w-2xl text-sm leading-7 text-muted md:text-base">@Description</p>
+            }
+        </div>
+    </div>
+
+    @if (Actions is not null)
+    {
+        <div class="flex items-center gap-3">
+            @Actions
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public string? Eyebrow { get; set; }
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public string? Description { get; set; }
+    [Parameter] public RenderFragment? Actions { get; set; }
+}
+

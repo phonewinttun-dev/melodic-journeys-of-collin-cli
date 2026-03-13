@@ -1,0 +1,12 @@
+{
+  "name": "melodic-journeys-of-collin",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -i ./BlazorWasm.MelodicJourneysOfCollin/Styles/app.css -o ./BlazorWasm.MelodicJourneysOfCollin/wwwroot/css/site.css --minify",
+    "watch:css": "tailwindcss -i ./BlazorWasm.MelodicJourneysOfCollin/Styles/app.css -o ./BlazorWasm.MelodicJourneysOfCollin/wwwroot/css/site.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.13",
+    "tailwindcss": "^4.1.13"
+  }
+}

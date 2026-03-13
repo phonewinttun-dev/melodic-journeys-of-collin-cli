@@ -1,0 +1,246 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "VT323", "Bebas Neue", "Impact", sans-serif;
+  --font-sans: "DM Sans", "Segoe UI", sans-serif;
+
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-bg: var(--bg);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-bg-strong: var(--bg-strong);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+
+  --shadow-chunky: 4px 4px 0px 0px rgba(0, 0, 0, 0.9);
+  --shadow-chunky-accent: 4px 4px 0px 0px var(--accent);
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+    --bg: #f6f1ee;
+    --bg-elevated: rgba(255, 250, 248, 0.92);
+    --bg-strong: rgba(247, 240, 237, 0.96);
+    --fg: #211515;
+    --muted: #6f5d5d;
+    --border: rgba(172, 8, 8, 0.14);
+    --ring: rgba(172, 8, 8, 0.28);
+    --accent: #ac0808;
+    --accent-rgb: 172, 8, 8;
+    --accent-strong: #850606;
+    --accent-strong-rgb: 133, 6, 6;
+    --accent-soft: rgba(177, 0, 0, 0.1);
+    --panel-shadow: 0 24px 72px rgba(80, 18, 18, 0.14);
+    --texture: radial-gradient(circle at top, rgba(255,255,255,0.82), transparent 48%),
+      linear-gradient(135deg, rgba(var(--accent-rgb), 0.08), transparent 34%),
+      radial-gradient(circle at 84% 14%, rgba(var(--accent-rgb), 0.08), transparent 28%),
+      linear-gradient(180deg, rgba(255,255,255,0.45), rgba(255,255,255,0));
+  }
+
+  :root.dark {
+    color-scheme: dark;
+    --bg: #120c0c;
+    --bg-elevated: rgba(28, 17, 17, 0.9);
+    --bg-strong: rgba(39, 22, 22, 0.96);
+    --fg: #f7efeb;
+    --muted: #bfaeae;
+    --border: rgba(172, 8, 8, 0.24);
+    --ring: rgba(172, 8, 8, 0.28);
+    --accent: #ac0808;
+    --accent-rgb: 172, 8, 8;
+    --accent-strong: #850606;
+    --accent-strong-rgb: 133, 6, 6;
+    --accent-soft: rgba(172, 8, 8, 0.16);
+    --panel-shadow: 0 30px 90px rgba(4, 2, 2, 0.48);
+    --texture: radial-gradient(circle at top, rgba(var(--accent-rgb), 0.12), transparent 44%),
+      linear-gradient(135deg, rgba(var(--accent-rgb), 0.12), transparent 35%),
+      radial-gradient(circle at 82% 12%, rgba(255, 255, 255, 0.04), transparent 24%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0));
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply m-0 min-h-screen antialiased;
+    font-family: var(--font-sans);
+    background: var(--bg);
+    color: var(--fg);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button,
+  input,
+  select {
+    font: inherit;
+  }
+
+  button {
+    @apply cursor-pointer;
+  }
+
+  img {
+    @apply block max-w-full;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: white;
+  }
+}
+
+@layer components {
+  .page-shell {
+    @apply relative min-h-screen overflow-hidden;
+  }
+
+  .page-shell::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(var(--accent-rgb), 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(var(--accent-rgb), 0.045) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.45), transparent 85%);
+  }
+
+  .surface-panel {
+    background: var(--bg-elevated);
+    border: 2px solid var(--fg);
+    box-shadow: var(--shadow-chunky);
+  }
+
+  .pixel-border {
+    border: 2px solid var(--fg);
+    box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 0.1);
+  }
+
+  .rope-border {
+    @apply border-2 border-black dark:border-white;
+  }
+
+  .section-label {
+    @apply inline-flex items-center gap-2 rounded-full px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.35em];
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .headline-display {
+    font-family: var(--font-display);
+    letter-spacing: 0.06em;
+  }
+
+  .nav-chip {
+    @apply rounded-full px-4 py-2 text-sm font-medium transition duration-200;
+    color: var(--muted);
+  }
+
+  .nav-chip.active,
+  .nav-chip:hover {
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .mix-knob {
+    @apply relative rounded-full;
+    background:
+      radial-gradient(circle at 30% 30%, rgba(255,255,255,0.82), transparent 28%),
+      linear-gradient(135deg, rgba(255,255,255,0.3), rgba(0,0,0,0.24)),
+      linear-gradient(180deg, rgba(var(--accent-rgb), 0.86), rgba(var(--accent-strong-rgb), 0.94));
+    box-shadow:
+      inset 0 6px 18px rgba(255,255,255,0.18),
+      inset 0 -10px 18px rgba(0,0,0,0.28),
+      0 8px 24px rgba(var(--accent-strong-rgb), 0.24);
+  }
+
+  .mix-slider {
+    accent-color: var(--accent);
+  }
+
+  .mix-slider::-webkit-slider-runnable-track {
+    height: 0.4rem;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(var(--accent-rgb), 0.22), rgba(var(--accent-rgb), 0.64), var(--accent));
+  }
+
+  .mix-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 1rem;
+    height: 1rem;
+    margin-top: -0.3rem;
+    border-radius: 999px;
+    background: #fff7f5;
+    border: 2px solid var(--accent);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.22);
+  }
+
+  .mix-slider::-moz-range-track {
+    height: 0.4rem;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(var(--accent-rgb), 0.22), rgba(var(--accent-rgb), 0.64), var(--accent));
+  }
+
+  .mix-slider::-moz-range-thumb {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 999px;
+    background: #fff7f5;
+    border: 2px solid var(--accent);
+  }
+
+  .vinyl-ring {
+    background:
+      radial-gradient(circle at center, rgba(255, 255, 255, 0.04) 0 12%, transparent 12% 13%, rgba(255, 255, 255, 0.06) 13% 16%, transparent 16% 22%, rgba(255,255,255,0.05) 22% 23%, transparent 23% 29%, rgba(255,255,255,0.05) 29% 30%, transparent 30%),
+      linear-gradient(135deg, rgba(255,255,255,0.18), rgba(0,0,0,0.42)),
+      #120c0c;
+  }
+
+  .theme-toggle {
+    @apply inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium transition;
+    background: var(--bg-strong);
+    border: 1px solid var(--border);
+  }
+}
+
+@layer utilities {
+  .text-muted {
+    color: var(--muted);
+  }
+
+  .bg-panel {
+    background: var(--bg-elevated);
+  }
+
+  .border-theme {
+    border-color: var(--border);
+  }
+
+  .text-accent,
+  .text-gold,
+  .text-secondary {
+    color: var(--accent);
+  }
+
+  .bg-accent-soft,
+  .bg-secondary-soft,
+  .bg-gold-soft {
+    background: var(--accent-soft);
+  }
+}
+
+

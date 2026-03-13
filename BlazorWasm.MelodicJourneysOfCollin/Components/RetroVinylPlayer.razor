@@ -1,0 +1,88 @@
+@inject PlayerStateService PlayerState
+
+<div class="flex flex-col h-full bg-[var(--bg-elevated)] border-2 border-black dark:border-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] p-8">
+    <div class="relative flex-1 flex items-center justify-center">
+        <!-- Vinyl Record Visual -->
+        <div class="relative w-80 h-80 rounded-full border-4 border-black bg-zinc-900 shadow-2xl flex items-center justify-center @(PlayerState.IsPlaying ? "animate-[spin_10s_linear_infinite]" : "")">
+             <div class="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_center,_transparent_40%,_black_41%,_black_42%,_transparent_43%)] opacity-20"></div>
+             <div class="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_center,_transparent_50%,_black_51%,_black_52%,_transparent_53%)] opacity-20"></div>
+             <div class="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_center,_transparent_60%,_black_61%,_black_62%,_transparent_63%)] opacity-20"></div>
+
+             <div class="w-24 h-24 rounded-full border-2 border-black bg-white overflow-hidden shadow-inner flex items-center justify-center">
+                @if (PlayerState.CurrentTrack is not null)
+                {
+                    <img src="@PlayerState.CurrentTrack.Cover" class="w-full h-full object-cover" />
+                }
+                else
+                {
+                    <div class="text-[var(--accent)] font-bold">M</div>
+                }
+             </div>
+             <div class="absolute w-4 h-4 rounded-full bg-black border border-white/20"></div>
+        </div>
+
+        <!-- Stylus Placeholder -->
+        <div class="absolute top-10 right-10 w-4 h-40 bg-zinc-600 border-2 border-black origin-top rotate-12 transition-transform @(PlayerState.IsPlaying ? "rotate-[25deg]" : "")"></div>
+    </div>
+
+    <div class="mt-8 space-y-4">
+        <div class="flex items-end justify-between">
+            <div class="min-w-0">
+                <h1 class="font-display text-5xl font-bold truncate text-[var(--fg)]">@TrackTitle</h1>
+                <div class="inline-block mt-2 px-4 py-1 border-2 border-black bg-black text-white rounded-full text-lg font-display">
+                    @Genre
+                </div>
+            </div>
+            <div class="flex items-center gap-2 text-3xl font-bold font-display">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-8 w-8 fill-[var(--accent)]"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3l7 3V5c0-1.1-.9-2-2-2z"/></svg>
+                392
+            </div>
+        </div>
+
+        <div class="flex items-center gap-6 mt-8">
+            <span class="font-display text-2xl">@FormatTime(PlayerState.CurrentTime)</span>
+            <div class="flex-1 h-3 border-2 border-black relative bg-zinc-200 dark:bg-zinc-800">
+                <div class="absolute inset-y-0 left-0 bg-black dark:bg-white" style="width: @(Progress)%"></div>
+                @for(int i=0; i<30; i++)
+                {
+                    var h = Random.Shared.Next(10, 100);
+                    <div class="absolute w-[2px] bg-black dark:bg-white opacity-20" style="left: @(i*3.4)%; height: @(h)%; bottom: 0;"></div>
+                }
+            </div>
+            <span class="font-display text-2xl">@FormatTime(PlayerState.Duration)</span>
+        </div>
+
+        <div class="flex items-center justify-center gap-12 mt-8">
+             <button class="text-4xl hover:scale-110 active:scale-95 transition" @onclick="PlayerState.PlayPrevious">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-10 w-10 fill-current"><path d="M6 6h2v12H6zm3.5 6L19 18V6z"/></svg>
+             </button>
+             <button class="w-20 h-20 rounded-full border-4 border-black bg-black text-white flex items-center justify-center hover:scale-105 active:scale-95 transition" @onclick="TogglePlayback">
+                @if (PlayerState.IsPlaying)
+                {
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-10 w-10 fill-current"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                }
+                else
+                {
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-10 w-10 fill-current"><path d="M8 5v14l11-7z"/></svg>
+                }
+             </button>
+             <button class="text-4xl hover:scale-110 active:scale-95 transition" @onclick="PlayerState.PlayNext">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-10 w-10 fill-current"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+             </button>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string TrackTitle => PlayerState.CurrentTrack?.Name?.Replace(".mp3", "", StringComparison.OrdinalIgnoreCase) ?? "No Track";
+    private string Genre => PlayerState.CurrentTrack?.Genre ?? "Classic";
+    private double Progress => PlayerState.Duration > 0 ? (PlayerState.CurrentTime / PlayerState.Duration) * 100 : 0;
+
+    private static string FormatTime(double seconds)
+    {
+        var time = TimeSpan.FromSeconds(seconds);
+        return $"{(int)time.TotalMinutes:0}:{time.Seconds:00}";
+    }
+
+    private void TogglePlayback() => PlayerState.SetPlaybackState(!PlayerState.IsPlaying);
+}

@@ -1,4 +1,4 @@
-﻿using BlazorWasm.MelodicJourneysOfCollin.Models;
+using BlazorWasm.MelodicJourneysOfCollin.Models;
 using BlazorWasm.MelodicJourneysOfCollin.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web.Virtualization;
@@ -7,7 +7,7 @@ namespace BlazorWasm.MelodicJourneysOfCollin.Pages.Playlist.LocalPlaylist;
 
 public partial class PageLocalPlaylist
 {
-    private List<MusicInfoModel>? _musicInfoList;
+    private List<MusicInfoModel> _musicInfoList = new();
 
     [Parameter]
     public EventCallback<MusicInfoModel> OnMusicSelection { get; set; }

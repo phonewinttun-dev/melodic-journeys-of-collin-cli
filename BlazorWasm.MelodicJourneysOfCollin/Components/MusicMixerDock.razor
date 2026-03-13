@@ -1,0 +1,298 @@
+@using Microsoft.JSInterop
+@implements IDisposable
+@inject PlayerStateService PlayerState
+@inject IJSRuntime JsRuntime
+
+<div class="pointer-events-none fixed inset-x-0 bottom-0 z-50 px-3 pb-3 md:px-6 md:pb-6">
+    <div class="pointer-events-auto mx-auto max-w-7xl overflow-hidden rounded-[2rem] surface-panel rope-border">
+        <div class="grid gap-4 border-b border-theme px-4 py-4 md:px-6 lg:grid-cols-[1.05fr_0.92fr_1.48fr]">
+            <div class="flex items-center gap-4">
+                <div class="relative h-20 w-20 shrink-0 rounded-[1.5rem] p-[6px] vinyl-ring shadow-2xl">
+                    <div class="h-full w-full overflow-hidden rounded-full border border-white/10">
+                        @if (PlayerState.CurrentTrack is not null)
+                        {
+                            <img src="@PlayerState.CurrentTrack.Cover" alt="@PlayerState.CurrentTrack.Name" class="h-full w-full object-cover @(PlayerState.IsPlaying ? "animate-[spin_14s_linear_infinite]" : string.Empty)" />
+                        }
+                    </div>
+                    <div class="absolute inset-0 m-auto h-4 w-4 rounded-full border border-white/30 bg-zinc-950"></div>
+                </div>
+
+                <div class="min-w-0 space-y-1">
+                    <div class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-accent">Old School Deck</div>
+                    <div class="truncate text-lg font-semibold text-[var(--fg)]">@TrackTitle</div>
+                    <div class="truncate text-sm text-muted">@TrackArtist</div>
+                    <div class="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-muted">
+                        <span>@TrackLength</span>
+                        <span class="h-1 w-1 rounded-full bg-[var(--accent)]"></span>
+                        <span>@(PlayerState.CurrentIndex + 1 > 0 ? $"Queue {PlayerState.CurrentIndex + 1}/{PlayerState.Queue.Count}" : "Guest track")</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="flex items-center justify-center gap-3">
+                    <button class="inline-flex h-12 w-12 items-center justify-center rounded-full border border-theme bg-panel text-[var(--fg)] transition hover:scale-105" type="button" @onclick="PlayPrevious" aria-label="Previous track">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5 fill-current"><path d="M7 5a1 1 0 0 1 1 1v12a1 1 0 1 1-2 0V6a1 1 0 0 1 1-1Zm3.2 7.8V11.2L18.4 6c.67-.42 1.6.06 1.6.85v10.3c0 .8-.93 1.27-1.6.85l-8.2-5.2Z"/></svg>
+                    </button>
+                    <button class="inline-flex h-16 w-16 items-center justify-center rounded-full bg-[var(--accent)] text-white shadow-[0_12px_24px_rgba(172,8,8,0.24)] transition hover:scale-105" type="button" @onclick="TogglePlayback" aria-label="Toggle playback">
+                        @if (PlayerState.IsPlaying)
+                        {
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-7 w-7 fill-current"><path d="M7 5.75A1.75 1.75 0 0 1 8.75 4h.5A1.75 1.75 0 0 1 11 5.75v12.5A1.75 1.75 0 0 1 9.25 20h-.5A1.75 1.75 0 0 1 7 18.25V5.75Zm6 0A1.75 1.75 0 0 1 14.75 4h.5A1.75 1.75 0 0 1 17 5.75v12.5A1.75 1.75 0 0 1 15.25 20h-.5A1.75 1.75 0 0 1 13 18.25V5.75Z"/></svg>
+                        }
+                        else
+                        {
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-7 w-7 fill-current"><path d="M8.75 4.2A1.75 1.75 0 0 0 6 5.65v12.7a1.75 1.75 0 0 0 2.75 1.45l9.3-6.35a1.75 1.75 0 0 0 0-2.9L8.75 4.2Z"/></svg>
+                        }
+                    </button>
+                    <button class="inline-flex h-12 w-12 items-center justify-center rounded-full border border-theme bg-panel text-[var(--fg)] transition hover:scale-105" type="button" @onclick="PlayNext" aria-label="Next track">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5 fill-current"><path d="M17 5a1 1 0 0 1 1 1v12a1 1 0 1 1-2 0V6a1 1 0 0 1 1-1ZM5.6 6c-.67-.42-1.6.06-1.6.85v10.3c0 .8.93 1.27 1.6.85l8.2-5.2v-1.6L5.6 6Z" transform="translate(2.2 0)"/></svg>
+                    </button>
+                </div>
+
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between text-[0.7rem] uppercase tracking-[0.3em] text-muted">
+                        <span>@FormatTime(PlayerState.CurrentTime)</span>
+                        <span>@FormatTime(PlayerState.Duration)</span>
+                    </div>
+                    <input class="mix-slider w-full" type="range" min="0" max="@(Math.Max(PlayerState.Duration, 1))" step="0.1" value="@PlayerState.CurrentTime" @oninput="SeekTrack" />
+                </div>
+            </div>
+
+            <div class="grid gap-4 lg:grid-cols-[1.25fr_0.85fr] lg:items-stretch">
+                <div class="space-y-4 rounded-[1.75rem] border border-theme bg-black/10 p-5 dark:bg-white/5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-[0.68rem] font-semibold uppercase tracking-[0.35em] text-muted">Mixer Bay</div>
+                            <div class="mt-1 text-sm font-semibold text-[var(--fg)]">Level + crate controls</div>
+                        </div>
+                        <div class="rounded-full bg-accent-soft px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-accent">@VolumeLabel</div>
+                    </div>
+
+                    <div class="grid gap-4 sm:grid-cols-[1.15fr_0.85fr]">
+                        <div class="rounded-[1.35rem] border border-theme bg-white/30 p-4 dark:bg-white/5">
+                            <div class="flex items-center justify-between text-[0.68rem] font-semibold uppercase tracking-[0.35em] text-muted">
+                                <span>Signal</span>
+                                <span>Master</span>
+                            </div>
+                            <div class="mt-4 flex items-end gap-2">
+                                @for (var i = 0; i < 10; i++)
+                                {
+                                    var threshold = (i + 1) / 10.0;
+                                    var active = PlayerState.Volume >= threshold;
+                                    <div class="w-full rounded-full transition @(active ? "bg-[var(--accent)] shadow-[0_0_12px_rgba(201,8,8,0.25)]" : "bg-white/10")" style="height:@(16 + (i * 6))px"></div>
+                                }
+                            </div>
+                            <input class="mix-slider mt-4 w-full" type="range" min="0" max="1" step="0.01" value="@PlayerState.Volume" @oninput="SetVolume" />
+                        </div>
+
+                        <div class="grid gap-3 content-start">
+                            <button class="flex items-center justify-between rounded-[1.25rem] border border-theme bg-panel px-4 py-3 text-left transition hover:scale-[1.02]" type="button" @onclick="TogglePlaylist">
+                                <span>
+                                    <span class="block text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-muted">Playlist</span>
+                                    <span class="mt-1 block text-sm font-semibold text-[var(--fg)]">Open crate</span>
+                                </span>
+                                <span class="inline-flex h-11 w-11 items-center justify-center rounded-full mix-knob border border-white/10 text-white">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5 fill-current"><path d="M6 5.75A1.75 1.75 0 0 1 7.75 4h8.5A1.75 1.75 0 0 1 18 5.75v12.5A1.75 1.75 0 0 1 16.25 20h-8.5A1.75 1.75 0 0 1 6 18.25V5.75Zm3 2.25a.75.75 0 0 0 0 1.5h6a.75.75 0 0 0 0-1.5H9Zm0 3.75a.75.75 0 0 0 0 1.5h6a.75.75 0 0 0 0-1.5H9Zm0 3.75a.75.75 0 0 0 0 1.5h4.5a.75.75 0 0 0 0-1.5H9Z"/></svg>
+                                </span>
+                            </button>
+
+                            <div class="flex items-center justify-between rounded-[1.25rem] border border-theme bg-panel px-4 py-3">
+                                <span>
+                                    <span class="block text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-muted">Accent</span>
+                                    <span class="mt-1 block text-sm font-semibold text-[var(--fg)]">Deck lights</span>
+                                </span>
+                                <span class="inline-flex items-center gap-2">
+                                    <span class="h-3 w-3 rounded-full bg-[var(--accent)] shadow-[0_0_10px_rgba(201,8,8,0.45)]"></span>
+                                    <span class="h-3 w-3 rounded-full bg-[var(--accent)] opacity-70 shadow-[0_0_10px_rgba(201,8,8,0.32)]"></span>
+                                    <span class="h-3 w-3 rounded-full bg-[var(--accent)] opacity-45 shadow-[0_0_10px_rgba(201,8,8,0.24)]"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid gap-3 content-start">
+                    <div class="rounded-[1.5rem] border border-theme bg-panel p-4">
+                        <div class="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-muted">Mode</div>
+                        <div class="mt-2 text-base font-semibold text-[var(--fg)]">Single deck</div>
+                        <p class="mt-2 text-sm leading-6 text-muted">Bigger right-side bay for tactile controls and status.</p>
+                    </div>
+                    <div class="flex items-center justify-center gap-3 rounded-[1.5rem] border border-theme bg-panel p-4">
+                        <div class="mix-knob flex h-14 w-14 items-center justify-center border border-white/10 text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5 fill-current"><path d="M12 5a1 1 0 0 1 1 1v5.59l2.3-2.29a1 1 0 1 1 1.4 1.41l-4 3.99a1 1 0 0 1-1.4 0l-4-3.99a1 1 0 0 1 1.4-1.41L11 11.59V6a1 1 0 0 1 1-1Zm-7 13a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H6a1 1 0 0 1-1-1Z"/></svg>
+                        </div>
+                        <div class="mix-knob flex h-14 w-14 items-center justify-center border border-white/10 text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5 fill-current"><path d="M4 7.75A1.75 1.75 0 0 1 5.75 6h12.5A1.75 1.75 0 0 1 20 7.75v8.5A1.75 1.75 0 0 1 18.25 18H5.75A1.75 1.75 0 0 1 4 16.25v-8.5Zm3.75.75a.75.75 0 0 0 0 1.5h8.5a.75.75 0 0 0 0-1.5h-8.5Zm0 4a.75.75 0 0 0 0 1.5h4.5a.75.75 0 0 0 0-1.5h-4.5Z"/></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (PlayerState.IsPlaylistOpen)
+        {
+            <div class="max-h-[40vh] overflow-auto px-4 py-4 md:px-6">
+                <div class="mb-3 flex items-center justify-between gap-4">
+                    <div>
+                        <div class="text-xs font-semibold uppercase tracking-[0.35em] text-accent">Playlist Crate</div>
+                        <div class="text-sm text-muted">Every local release is ready for the dock.</div>
+                    </div>
+                    <button class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-theme bg-panel text-[var(--fg)] transition hover:scale-105" type="button" @onclick="TogglePlaylist" aria-label="Close crate">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5 fill-current"><path d="M6.97 5.56a1 1 0 0 1 1.41 0L12 9.17l3.62-3.61a1 1 0 1 1 1.41 1.41L13.41 10.6l3.62 3.61a1 1 0 0 1-1.41 1.42L12 12l-3.62 3.62a1 1 0 1 1-1.41-1.42l3.62-3.61-3.62-3.63a1 1 0 0 1 0-1.4Z"/></svg>
+                    </button>
+                </div>
+
+                <div class="grid gap-3">
+                    @for (var i = 0; i < PlayerState.Queue.Count; i++)
+                    {
+                        var track = PlayerState.Queue[i];
+                        var isCurrent = PlayerState.CurrentTrack?.Link == track.Link;
+                        <button class="flex items-center gap-4 rounded-[1.25rem] border px-4 py-3 text-left transition @(isCurrent ? "border-[var(--accent)]/40 bg-accent-soft" : "border-theme bg-black/5 hover:bg-black/10 dark:bg-white/5")" type="button" @onclick="() => PlayTrackAt(i)">
+                            <div class="text-xs font-semibold uppercase tracking-[0.3em] text-muted">@((i + 1).ToString("00"))</div>
+                            <img src="@track.Cover" alt="@track.Name" class="h-12 w-12 rounded-xl object-cover" />
+                            <div class="min-w-0 flex-1">
+                                <div class="truncate text-sm font-semibold text-[var(--fg)]">@DisplayName(track)</div>
+                                <div class="truncate text-xs text-muted">@track.Artists</div>
+                            </div>
+                            <div class="text-xs uppercase tracking-[0.3em] text-muted">@track.Length</div>
+                        </button>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<audio @ref="_audioRef" preload="metadata" class="hidden"></audio>
+
+@code {
+    private ElementReference _audioRef;
+    private DotNetObjectReference<MusicMixerDock>? _dotNetReference;
+    private string? _loadedTrack;
+    private double _lastVolume = -1;
+
+    private string TrackTitle => PlayerState.CurrentTrack is null ? "Select a track" : DisplayName(PlayerState.CurrentTrack);
+    private string TrackArtist => PlayerState.CurrentTrack?.Artists ?? "Collin";
+    private string TrackLength => PlayerState.CurrentTrack?.Length ?? "--:--";
+    private string VolumeLabel => $"{Math.Round(PlayerState.Volume * 100)}%";
+
+    protected override void OnInitialized()
+    {
+        PlayerState.Changed += OnPlayerStateChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _dotNetReference = DotNetObjectReference.Create(this);
+            await JsRuntime.InvokeVoidAsync("collinPlayer.init", _audioRef, _dotNetReference);
+        }
+
+        if (PlayerState.CurrentTrack?.Link is { } link && _loadedTrack != link)
+        {
+            _loadedTrack = link;
+            await JsRuntime.InvokeVoidAsync("collinPlayer.setSource", _audioRef, link.ToLocalLink(), PlayerState.IsPlaying);
+        }
+
+        if (Math.Abs(_lastVolume - PlayerState.Volume) > 0.001)
+        {
+            _lastVolume = PlayerState.Volume;
+            await JsRuntime.InvokeVoidAsync("collinPlayer.setVolume", _audioRef, PlayerState.Volume);
+        }
+    }
+
+    private void OnPlayerStateChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private async Task TogglePlayback()
+    {
+        if (PlayerState.CurrentTrack is null && PlayerState.Queue.Count > 0)
+        {
+            PlayerState.PlayTrackAt(0);
+            return;
+        }
+
+        if (PlayerState.IsPlaying)
+        {
+            await JsRuntime.InvokeVoidAsync("collinPlayer.pause", _audioRef);
+            PlayerState.SetPlaybackState(false);
+        }
+        else
+        {
+            await JsRuntime.InvokeVoidAsync("collinPlayer.play", _audioRef);
+            PlayerState.SetPlaybackState(true);
+        }
+    }
+
+    private void PlayPrevious() => PlayerState.PlayPrevious();
+
+    private void PlayNext() => PlayerState.PlayNext();
+
+    private void PlayTrackAt(int index) => PlayerState.PlayTrackAt(index);
+
+    private void TogglePlaylist() => PlayerState.TogglePlaylist();
+
+    private async Task SetVolume(ChangeEventArgs args)
+    {
+        if (!double.TryParse(args.Value?.ToString(), out var value))
+        {
+            return;
+        }
+
+        PlayerState.SetVolume(value);
+        await JsRuntime.InvokeVoidAsync("collinPlayer.setVolume", _audioRef, value);
+    }
+
+    private async Task SeekTrack(ChangeEventArgs args)
+    {
+        if (!double.TryParse(args.Value?.ToString(), out var value))
+        {
+            return;
+        }
+
+        await JsRuntime.InvokeVoidAsync("collinPlayer.seek", _audioRef, value);
+        PlayerState.SetTimeline(value, PlayerState.Duration);
+    }
+
+    [JSInvokable]
+    public Task HandleTimelineChanged(double currentTime, double duration, bool isPlaying, double volume)
+    {
+        PlayerState.SetTimeline(currentTime, duration);
+        PlayerState.SetPlaybackState(isPlaying);
+        PlayerState.SetVolume(volume);
+        return Task.CompletedTask;
+    }
+
+    [JSInvokable]
+    public Task HandleEnded()
+    {
+        PlayerState.PlayNext();
+        return Task.CompletedTask;
+    }
+
+    private static string FormatTime(double seconds)
+    {
+        if (seconds <= 0)
+        {
+            return "00:00";
+        }
+
+        var time = TimeSpan.FromSeconds(seconds);
+        return time.TotalHours >= 1 ? $"{(int)time.TotalHours:00}:{time.Minutes:00}:{time.Seconds:00}" : $"{time.Minutes:00}:{time.Seconds:00}";
+    }
+
+    private static string DisplayName(MusicInfoModel track) => (track.Name ?? string.Empty).Replace(".mp3", string.Empty, StringComparison.OrdinalIgnoreCase);
+
+    public void Dispose()
+    {
+        PlayerState.Changed -= OnPlayerStateChanged;
+        _dotNetReference?.Dispose();
+    }
+}
+
+
+
+
