@@ -366,3 +366,7 @@ FodyWeavers.xsd
 .agent/
 .agents/
 skills-lock.json
+
+docs/
+
+.superpowers/
