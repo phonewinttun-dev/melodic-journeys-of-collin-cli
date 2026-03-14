@@ -363,3 +363,6 @@ MigrationBackup/
 FodyWeavers.xsd
 
 .dotnet/
+.agent/
+.agents/
+skills-lock.json
