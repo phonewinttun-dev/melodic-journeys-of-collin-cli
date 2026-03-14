@@ -6,12 +6,27 @@
 @inject IJSRuntime JsRuntime
 
 <div class="page-shell flex min-h-screen bg-[var(--bg)] font-sans">
-    <NavSidebar />
+    <NavSidebar IsMobileMenuOpen="IsMobileNavOpen" OnNavigate="CloseMobileNav" />
 
-    <div class="flex min-h-screen flex-1 flex-col pl-20">
+    @if (IsMobileNavOpen)
+    {
+        <button class="fixed inset-0 z-40 bg-black/45 md:hidden" type="button" @onclick="CloseMobileNav" aria-label="Close navigation menu"></button>
+    }
+
+    <div class="flex min-h-screen flex-1 flex-col pl-0 md:pl-20">
         <header class="space-y-4 px-4 pb-2 pt-4 md:px-8 md:pt-6">
             <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
                 <div class="flex items-center gap-4 xl:flex-1">
+                    <button class="inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-black bg-[var(--bg)] text-[var(--fg)] md:hidden dark:border-white" type="button" @onclick="ToggleMobileNav" aria-label="Toggle navigation menu" aria-expanded="@IsMobileNavOpen" aria-controls="app-sidebar">
+                        @if (IsMobileNavOpen)
+                        {
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5 fill-current"><path d="M18.3 5.7a1 1 0 0 0-1.4 0L12 10.6 7.1 5.7a1 1 0 1 0-1.4 1.4L10.6 12l-4.9 4.9a1 1 0 1 0 1.4 1.4L12 13.4l4.9 4.9a1 1 0 0 0 1.4-1.4L13.4 12l4.9-4.9a1 1 0 0 0 0-1.4Z" /></svg>
+                        }
+                        else
+                        {
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5 fill-current"><path d="M4 7a1 1 0 0 1 1-1h14a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1Zm0 5a1 1 0 0 1 1-1h14a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1Zm1 4a1 1 0 1 0 0 2h14a1 1 0 1 0 0-2H5Z" /></svg>
+                        }
+                    </button>
                     <BrandLogo Size="56" ClassName="shadow-[4px_4px_0_0_rgba(0,0,0,0.9)]" />
                     <div>
                         <div class="headline-display text-4xl text-[var(--fg)]">Collin</div>
@@ -47,6 +62,7 @@
 </div>
 
 @code {
+    private bool IsMobileNavOpen;
     private bool IsDjRoute => Navigation.Uri.Contains("/dj", StringComparison.OrdinalIgnoreCase);
 
     protected override void OnInitialized()
@@ -69,7 +85,15 @@
 
     private void OnLibraryChanged() => InvokeAsync(StateHasChanged);
 
-    private void OnLocationChanged(object? sender, LocationChangedEventArgs e) => InvokeAsync(StateHasChanged);
+    private void ToggleMobileNav() => IsMobileNavOpen = !IsMobileNavOpen;
+
+    private void CloseMobileNav() => IsMobileNavOpen = false;
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        IsMobileNavOpen = false;
+        InvokeAsync(StateHasChanged);
+    }
 
     public void Dispose()
     {

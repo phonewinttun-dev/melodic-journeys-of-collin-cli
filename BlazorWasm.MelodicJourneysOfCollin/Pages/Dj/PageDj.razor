@@ -3,22 +3,22 @@
 @inject LibraryStateService LibraryState
 
 <div class="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-    <section class="surface-panel rounded-[2rem] p-6 md:p-8">
-        <div class="flex items-center justify-between gap-4">
+    <section class="surface-panel rounded-[2rem] p-4 sm:p-6 md:p-8">
+        <div class="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
                 <div class="section-label">DJ Room</div>
                 <div class="mt-3 max-w-xl text-sm leading-7 text-muted">This is the one page that leans fully into the deck fantasy. It uses the same shared playback as the top player, but gives the music a louder visual stage.</div>
             </div>
-            <a href="/" class="inline-flex items-center justify-center rounded-full border-2 border-black bg-[var(--bg)] px-5 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-[var(--fg)] transition hover:bg-accent-soft dark:border-white">Back Home</a>
+            <a href="/" class="inline-flex w-full items-center justify-center rounded-full border-2 border-black bg-[var(--bg)] px-5 py-3 text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-[var(--fg)] transition hover:bg-accent-soft sm:w-auto dark:border-white">Back Home</a>
         </div>
 
         <div class="mt-8 grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
             <div class="space-y-5">
-                <div class="relative mx-auto flex h-[22rem] w-[22rem] items-center justify-center rounded-full border-4 border-black bg-zinc-900 shadow-[12px_12px_0_0_rgba(0,0,0,0.9)] dark:border-white @(PlayerState.IsPlaying ? "animate-[spin_14s_linear_infinite]" : string.Empty)">
+                <div class="relative mx-auto flex h-[15rem] w-[15rem] max-w-full items-center justify-center rounded-full border-4 border-black bg-zinc-900 shadow-[12px_12px_0_0_rgba(0,0,0,0.9)] sm:h-[18rem] sm:w-[18rem] md:h-[20rem] md:w-[20rem] lg:h-[22rem] lg:w-[22rem] dark:border-white @(PlayerState.IsPlaying ? "animate-[spin_14s_linear_infinite]" : string.Empty)">
                     <div class="absolute inset-[8%] rounded-full border border-white/10"></div>
                     <div class="absolute inset-[18%] rounded-full border border-white/10"></div>
                     <div class="absolute inset-[28%] rounded-full border border-white/10"></div>
-                    <div class="h-24 w-24 overflow-hidden rounded-full border-4 border-black bg-[var(--bg)] dark:border-white">
+                    <div class="h-20 w-20 overflow-hidden rounded-full border-4 border-black bg-[var(--bg)] sm:h-24 sm:w-24 dark:border-white">
                         @if (CurrentTrack is not null)
                         {
                             <img src="@CurrentTrack.Cover" alt="@CurrentTrack.Name" class="h-full w-full object-cover" />
@@ -27,11 +27,11 @@
                     <div class="absolute h-4 w-4 rounded-full border border-white/20 bg-black"></div>
                 </div>
 
-                <div class="rounded-[1.5rem] border-2 border-black bg-[var(--bg)] p-5 dark:border-white">
-                    <div class="flex items-center justify-between gap-3">
-                        <div>
+                <div class="rounded-[1.5rem] border-2 border-black bg-[var(--bg)] p-4 sm:p-5 dark:border-white">
+                    <div class="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div class="min-w-0">
                             <div class="text-xs uppercase tracking-[0.35em] text-accent">Now Mixing</div>
-                            <div class="mt-2 font-display text-4xl text-[var(--fg)]">@DisplayName(CurrentTrack)</div>
+                            <div class="mt-2 font-display text-3xl leading-tight break-words text-[var(--fg)] sm:text-4xl">@DisplayName(CurrentTrack)</div>
                             <div class="text-sm text-muted">@CurrentTrack?.Artists</div>
                         </div>
                         @if (CurrentTrack is not null)
@@ -48,11 +48,11 @@
                         <input class="mix-slider w-full" type="range" min="0" max="@(Math.Max(PlayerState.Duration, 1))" step="0.1" value="@PlayerState.CurrentTime" @oninput="SeekTrack" />
                     </div>
 
-                    <div class="mt-6 flex items-center justify-center gap-4">
-                        <button class="inline-flex h-12 w-12 items-center justify-center rounded-full border-2 border-black bg-[var(--bg)] text-[var(--fg)] dark:border-white" type="button" @onclick="PlayerState.PlayPrevious">
+                    <div class="mt-6 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+                        <button class="inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-black bg-[var(--bg)] text-[var(--fg)] sm:h-12 sm:w-12 dark:border-white" type="button" @onclick="PlayerState.PlayPrevious">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5 fill-current"><path d="M7 5a1 1 0 0 1 1 1v12a1 1 0 1 1-2 0V6a1 1 0 0 1 1-1Zm3.2 7.8V11.2L18.4 6c.67-.42 1.6.06 1.6.85v10.3c0 .8-.93 1.27-1.6.85l-8.2-5.2Z"/></svg>
                         </button>
-                        <button class="inline-flex h-16 w-16 items-center justify-center rounded-full border-2 border-black bg-[var(--accent)] text-white shadow-[4px_4px_0_0_rgba(0,0,0,0.9)] dark:border-white" type="button" @onclick="PlayerState.TogglePlayback">
+                        <button class="inline-flex h-14 w-14 items-center justify-center rounded-full border-2 border-black bg-[var(--accent)] text-white shadow-[4px_4px_0_0_rgba(0,0,0,0.9)] sm:h-16 sm:w-16 dark:border-white" type="button" @onclick="PlayerState.TogglePlayback">
                             @if (PlayerState.IsPlaying)
                             {
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-6 w-6 fill-current"><path d="M7 5.75A1.75 1.75 0 0 1 8.75 4h.5A1.75 1.75 0 0 1 11 5.75v12.5A1.75 1.75 0 0 1 9.25 20h-.5A1.75 1.75 0 0 1 7 18.25V5.75Zm6 0A1.75 1.75 0 0 1 14.75 4h.5A1.75 1.75 0 0 1 17 5.75v12.5A1.75 1.75 0 0 1 15.25 20h-.5A1.75 1.75 0 0 1 13 18.25V5.75Z"/></svg>
@@ -62,7 +62,7 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-6 w-6 fill-current"><path d="M8.75 4.2A1.75 1.75 0 0 0 6 5.65v12.7a1.75 1.75 0 0 0 2.75 1.45l9.3-6.35a1.75 1.75 0 0 0 0-2.9L8.75 4.2Z"/></svg>
                             }
                         </button>
-                        <button class="inline-flex h-12 w-12 items-center justify-center rounded-full border-2 border-black bg-[var(--bg)] text-[var(--fg)] dark:border-white" type="button" @onclick="PlayerState.PlayNext">
+                        <button class="inline-flex h-11 w-11 items-center justify-center rounded-full border-2 border-black bg-[var(--bg)] text-[var(--fg)] sm:h-12 sm:w-12 dark:border-white" type="button" @onclick="PlayerState.PlayNext">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5 fill-current"><path d="M17 5a1 1 0 0 1 1 1v12a1 1 0 1 1-2 0V6a1 1 0 0 1 1-1ZM5.6 6c-.67-.42-1.6.06-1.6.85v10.3c0 .8.93 1.27 1.6.85l8.2-5.2v-1.6L5.6 6Z" transform="translate(2.2 0)"/></svg>
                         </button>
                     </div>
@@ -70,15 +70,15 @@
             </div>
 
             <div class="space-y-5">
-                <div class="rounded-[1.75rem] border-2 border-black bg-[var(--bg)] p-5 shadow-[4px_4px_0_0_rgba(0,0,0,0.9)] dark:border-white">
-                    <div class="flex items-center justify-between gap-4">
+                <div class="rounded-[1.75rem] border-2 border-black bg-[var(--bg)] p-4 shadow-[4px_4px_0_0_rgba(0,0,0,0.9)] sm:p-5 dark:border-white">
+                    <div class="flex flex-wrap items-center justify-between gap-4">
                         <div>
                             <div class="text-xs uppercase tracking-[0.35em] text-accent">Master</div>
-                            <div class="mt-1 font-display text-3xl text-[var(--fg)]">Queue Control</div>
+                            <div class="mt-1 font-display text-2xl text-[var(--fg)] sm:text-3xl">Queue Control</div>
                         </div>
                         <div class="rounded-full bg-accent-soft px-3 py-1 text-xs uppercase tracking-[0.28em] text-accent">@DjQueue.Count tracks</div>
                     </div>
-                    <div class="mt-5 space-y-3 max-h-[42rem] overflow-auto pr-1">
+                    <div class="mt-5 space-y-3 max-h-[50vh] overflow-auto pr-1 sm:max-h-[42rem]">
                         @for (var i = 0; i < DjQueue.Count; i++)
                         {
                             var track = DjQueue[i];
@@ -86,7 +86,7 @@
                             <button class="flex w-full items-center gap-3 rounded-[1.2rem] border-2 border-black px-3 py-3 text-left transition @(isCurrent ? "bg-accent-soft text-accent" : "bg-[var(--bg-elevated)] text-[var(--fg)] hover:bg-accent-soft") dark:border-white" type="button" @onclick="() => PlayerState.PlayQueue(DjQueue, i)">
                                 <img src="@track.Cover" alt="@track.Name" class="h-12 w-12 rounded-xl object-cover" />
                                 <div class="min-w-0 flex-1">
-                                    <div class="truncate font-display text-2xl">@DisplayName(track)</div>
+                                    <div class="truncate font-display text-xl sm:text-2xl">@DisplayName(track)</div>
                                     <div class="truncate text-xs text-muted">@track.Artists</div>
                                 </div>
                                 <FavoriteButton Track="track" />
@@ -95,15 +95,15 @@
                     </div>
                 </div>
 
-                <div class="rounded-[1.75rem] border-2 border-black bg-[var(--bg)] p-5 dark:border-white">
+                <div class="rounded-[1.75rem] border-2 border-black bg-[var(--bg)] p-4 sm:p-5 dark:border-white">
                     <div class="text-xs uppercase tracking-[0.35em] text-accent">Fast Lane</div>
-                    <div class="mt-2 font-display text-3xl text-[var(--fg)]">Quick album jumps</div>
+                    <div class="mt-2 font-display text-2xl text-[var(--fg)] sm:text-3xl">Quick album jumps</div>
                     <div class="mt-4 grid gap-3 sm:grid-cols-2">
                         @foreach (var album in LibraryState.Albums.Take(4))
                         {
                             <button class="rounded-[1.2rem] border-2 border-black bg-[var(--bg-elevated)] px-4 py-4 text-left transition hover:bg-accent-soft dark:border-white" type="button" @onclick="() => PlayerState.PlayQueue(album.Tracks)">
                                 <div class="text-xs uppercase tracking-[0.3em] text-muted">@album.Tracks.Count tracks</div>
-                                <div class="mt-2 font-display text-2xl text-[var(--fg)]">@album.Title</div>
+                                <div class="mt-2 font-display text-xl text-[var(--fg)] sm:text-2xl">@album.Title</div>
                             </button>
                         }
                     </div>
