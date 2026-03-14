@@ -51,10 +51,22 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: dotnet publish BlazorWasm.MelodicJourneysOfCollin/BlazorWasm.MelodicJourneysOfCollin.csproj -c Release -o release
 
-      # 7. Push to Vercel
+      # 7. Verify Build Output
+      - name: Verify Build Output
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: |
+          if [ -d "./release/wwwroot" ]; then
+            echo "Build output directory found."
+            ls -R ./release/wwwroot
+          else
+            echo "Error: Build output directory not found!"
+            exit 1
+          fi
+
+      # 8. Push to Vercel
       - name: Deploy to Vercel
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        uses: amondnet/vercel-action@v25
+        uses: amondnet/vercel-action@v25.2.0
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
