@@ -2,6 +2,7 @@ using MelodicJourney.CLI.Models;
 using MelodicJourney.CLI.Services;
 using MelodicJourney.CLI.UI;
 using Spectre.Console;
+using System.IO;
 
 namespace MelodicJourney.CLI;
 
@@ -25,7 +26,24 @@ class Program
             var selectedTrack = TerminalUI.PromptTrackSelection(tracks);
             if (selectedTrack == null) break;
 
-            await audioService.PlayAsync(selectedTrack);
+            try
+            {
+                await audioService.PlayAsync(selectedTrack);
+            }
+            catch (FileNotFoundException ex)
+            {
+                AnsiConsole.MarkupLine($"[red]Error:[/] {Markup.Escape(ex.Message)}");
+                AnsiConsole.MarkupLine("[yellow]Press any key to continue...[/]");
+                Console.ReadKey(true);
+                continue;
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.MarkupLine($"[red]An unexpected error occurred:[/] {Markup.Escape(ex.Message)}");
+                AnsiConsole.MarkupLine("[yellow]Press any key to continue...[/]");
+                Console.ReadKey(true);
+                continue;
+            }
 
             TerminalUI.RenderHeader();
             TerminalUI.ShowPlayerStatus(selectedTrack, true);

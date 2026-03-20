@@ -1,6 +1,7 @@
-using Spectre.Console;
 using MelodicJourney.CLI.Models;
 using MelodicJourney.CLI.Services;
+using Spectre.Console;
+using System.Xml.Linq;
 
 namespace MelodicJourney.CLI.UI;
 
@@ -9,7 +10,7 @@ public static class TerminalUI
     public static void RenderHeader()
     {
         AnsiConsole.Clear();
-        var rule = new Rule("[red]🏴‍☠️ MELODIC JOURNEYS OF COLLIN 🏴‍☠️[/]")
+        var rule = new Rule("[red]MELODIC JOURNEYS OF COLLIN[/]")
         {
             Style = Style.Parse("red"),
             Justification = Justify.Center
@@ -25,8 +26,18 @@ public static class TerminalUI
                 .Title("[yellow]Select a track to play (or press Esc to exit)[/]")
                 .PageSize(10)
                 .AddChoices(tracks)
-                .UseConverter(t => $"{t.Name} - [grey]{t.Genre}[/]")
-        );
+                .UseConverter(t =>
+                {
+                    var name = Markup.Escape(Markup.Escape(t.Name ?? "Unknown"));
+                    var genre = Markup.Escape(Markup.Escape(t.Genre ?? "Unknown"));
+                    return $"{name} - [grey]{genre}[/]";
+                }));
+
+        if (!tracks.Any())
+        {
+            AnsiConsole.MarkupLine("[red]No tracks available[/]");
+            return null;
+        }
 
         return choice;
     }

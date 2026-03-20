@@ -9,6 +9,13 @@ namespace MelodicJourney.CLI.Services
         private static readonly Lazy<List<MusicInfoModel>> _localPlaylist = new(() =>
         {
             var tracks = GetMusicPlayList<MusicInfoModel>(JsonData.LocalPlaylist);
+            foreach (var track in tracks)
+            {
+                if (!string.IsNullOrWhiteSpace(track.Link) && !track.Link.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                {
+                    track.Link = track.Link.ToLocalLink();
+                }
+            }
             AnnotateAlbums(tracks);
             return tracks;
         });
@@ -131,7 +138,8 @@ namespace MelodicJourney.CLI.Services
         public static string MusicList { get; } = @"[
         {
             ""Id"": ""1"",
-            ""Name"": ""Collin - Day 4 [2023]"",
+            ""Name"": ""Collin - Day 1 [2023].mp3"",
+
             ""Genre"": ""EDM"",
             ""Link"": ""https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1493379526&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"",
             ""PlatformType"": ""0"",
@@ -1495,7 +1503,7 @@ namespace MelodicJourney.CLI.Services
   {
     ""Id"": ""1"",
     ""Cover"": ""https://i1.sndcdn.com/artworks-jTXpryRdmvyXaCtc-PNmpJw-t500x500.png"",
-    ""Name"": ""Collin - Day 4 [2023].mp3"",
+    ""Name"": ""Collin - Day 4 [2023]"",
     ""Artists"": ""Collin"",
     ""Genre"": ""EDM"",
     ""Link"": ""Collin - Day 4 [2023].mp3"",
@@ -1514,7 +1522,7 @@ namespace MelodicJourney.CLI.Services
   {
     ""Id"": ""2"",
     ""Cover"": ""https://i1.sndcdn.com/artworks-hnK15ryWAo9nnlMa-4ZlroA-t500x500.png"",
-    ""Name"": ""Collin - Day 3 [2023].mp3"",
+    ""Name"": ""Collin - Day 3 [2023]"",
     ""Artists"": ""Collin"",
     ""Genre"": ""EDM"",
     ""Link"": ""Collin - Day 3 [2023].mp3"",
@@ -1533,7 +1541,7 @@ namespace MelodicJourney.CLI.Services
   {
     ""Id"": ""3"",
     ""Cover"": ""https://i1.sndcdn.com/artworks-2by615ONaIcGCBDG-CoZTEw-t500x500.png"",
-    ""Name"": ""Collin - Day 2 [2023].mp3"",
+    ""Name"": ""Collin - Day 2 [2023]"",
     ""Artists"": ""Collin"",
     ""Genre"": ""EDM"",
     ""Link"": ""Collin - Day 2 [2023].mp3"",
@@ -1552,7 +1560,7 @@ namespace MelodicJourney.CLI.Services
   {
     ""Id"": ""4"",
     ""Cover"": ""https://i1.sndcdn.com/artworks-cn0jaMOECnDo8eVr-TkOi8A-t500x500.png"",
-    ""Name"": ""Collin - Day 1 [2023].mp3"",
+    ""Name"": ""Collin - Day 1 [2023]"",
     ""Artists"": ""Collin"",
     ""Genre"": ""EDM"",
     ""Link"": ""Collin - Day 1 [2023].mp3"",
@@ -1571,10 +1579,10 @@ namespace MelodicJourney.CLI.Services
   {
     ""Id"": ""5"",
     ""Cover"": ""https://i1.sndcdn.com/artworks-CjeKyVjBxPpfRUbe-xCUWTA-t500x500.png"",
-    ""Name"": ""Collin - Day 4.mp3"",
+    ""Name"": ""Collin - ID (A Moment to Remember)"",
     ""Artists"": ""Collin"",
     ""Genre"": ""EDM"",
-    ""Link"": ""Collin - Day 4.mp3"",
+    ""Link"": ""Collin - ID (A Moment to Remember) (Original Mix).mp3"",
     ""Length"": ""06:14"",
     ""DownloadLinks"": [
       {
@@ -1590,10 +1598,10 @@ namespace MelodicJourney.CLI.Services
   {
     ""Id"": ""6"",
     ""Cover"": ""https://i1.sndcdn.com/artworks-Mky3aRFlJMQ2avS0-F9lEuA-t500x500.png"",
-    ""Name"": ""Collin - Day 3.mp3"",
+    ""Name"": ""Collin - ID (I miss you so bad in Thingyan)"",
     ""Artists"": ""Collin"",
     ""Genre"": ""EDM"",
-    ""Link"": ""Collin - Day 3.mp3"",
+    ""Link"": ""Collin - ID (I miss you so bad in Thingyan) (1).mp3"",
     ""Length"": ""10:53"",
     ""DownloadLinks"": [
       {
@@ -1609,10 +1617,10 @@ namespace MelodicJourney.CLI.Services
   {
     ""Id"": ""7"",
     ""Cover"": ""https://i1.sndcdn.com/artworks-UwAyU1IXcKDkbzRI-1I1J0w-t500x500.png"",
-    ""Name"": ""Collin - Day 2.mp3"",
+    ""Name"": ""Collin - Day 2"",
     ""Artists"": ""Collin"",
     ""Genre"": ""EDM"",
-    ""Link"": ""Collin - Day 2.mp3"",
+    ""Link"": ""Collin - Day 2 [2023].mp3"",
     ""Length"": ""06:59"",
     ""DownloadLinks"": [
       {
@@ -1628,29 +1636,10 @@ namespace MelodicJourney.CLI.Services
   {
     ""Id"": ""8"",
     ""Cover"": ""https://i1.sndcdn.com/artworks-OLgFQA4WzepOKM7l-XBUX6Q-t500x500.png"",
-    ""Name"": ""Collin - Day 1.mp3"",
+    ""Name"": ""Collin - Day 1"",
     ""Artists"": ""Collin"",
     ""Genre"": ""EDM"",
-    ""Link"": ""Collin - Day 1.mp3"",
-    ""Length"": ""07:52"",
-    ""DownloadLinks"": [
-      {
-        ""PlatformType"": ""Mediafire"",
-        ""DownloadLink"": """"
-      },
-      {
-        ""PlatformType"": ""KrakenFiles"",
-        ""DownloadLink"": """"
-      }
-    ]
-  },
-  {
-    ""Id"": ""8"",
-    ""Cover"": ""https://i1.sndcdn.com/artworks-OLgFQA4WzepOKM7l-XBUX6Q-t500x500.png"",
-    ""Name"": ""Collin - Day 1.mp3"",
-    ""Artists"": ""Collin"",
-    ""Genre"": ""EDM"",
-    ""Link"": ""Collin - Day 1.mp3"",
+    ""Link"": ""Collin - Day 1 [2023].mp3"",
     ""Length"": ""07:52"",
     ""DownloadLinks"": [
       {
@@ -1666,7 +1655,7 @@ namespace MelodicJourney.CLI.Services
   {
     ""Id"": ""9"",
     ""Cover"": ""https://i1.sndcdn.com/artworks-KoVmhaRr1zo1NJbh-piPuQQ-t500x500.jpg"",
-    ""Name"": ""Halsey - Without Me (Sagemode & Collin Remix).mp3"",
+    ""Name"": ""Halsey - Without Me (Sagemode & Collin Remix)"",
     ""Artists"": ""Sagemode & Collin"",
     ""Genre"": ""EDM"",
     ""Link"": ""Halsey - Without Me (Sagemode & Collin Remix).mp3"",
@@ -1685,7 +1674,7 @@ namespace MelodicJourney.CLI.Services
   {
     ""Id"": ""10"",
     ""Cover"": ""https://i1.sndcdn.com/artworks-yQZhz3CLbJTmIhAJ-VC9zng-t500x500.png"",
-    ""Name"": ""Blasterjaxx - Legion (Collin Remix).mp3"",
+    ""Name"": ""Blasterjaxx - Legion (Collin Remix)"",
     ""Artists"": ""Collin"",
     ""Genre"": ""EDM"",
     ""Link"": ""Blasterjaxx - Legion (Collin Remix).mp3"",
@@ -1704,7 +1693,7 @@ namespace MelodicJourney.CLI.Services
   {
     ""Id"": ""11"",
     ""Cover"": ""https://i1.sndcdn.com/artworks-aUi4NcJK2x3idaeF-FsYCQg-t500x500.png"",
-    ""Name"": ""The Kid Laroi, Justin Bieber - Stay (Collin Remix).mp3"",
+    ""Name"": ""The Kid Laroi, Justin Bieber - Stay (Collin Remix)"",
     ""Artists"": ""Collin"",
     ""Genre"": ""EDM"",
     ""Link"": ""The Kid Laroi, Justin Bieber - Stay (Collin Remix).mp3"",
@@ -1722,11 +1711,11 @@ namespace MelodicJourney.CLI.Services
   },
   {
     ""Id"": ""12"",
-    ""Cover"": ""https://i1.sndcdn.com/artworks-g4iH3MIa67IL2oAv-2l5hpg-t500x500.png"",
-    ""Name"": ""Sagemode vs Collin - Sky Cracker (Original Mix).mp3"",
-    ""Artists"": ""Sagemode & Collin"",
+    ""Cover"": ""https://i1.sndcdn.com/artworks-pqqrhje7kzz301k-t500x500.jpg"",
+    ""Name"": ""SageMode x Collin - Sky Cracker (Original Mix)"",
+    ""Artists"": ""SageMode x Collin"",
     ""Genre"": ""EDM"",
-    ""Link"": ""Sagemode vs Collin - Sky Cracker (Original Mix).mp3"",
+    ""Link"": ""SageMode x Collin - Sky Cracker (Original Mix).mp3"",
     ""Length"": ""03:45"",
     ""DownloadLinks"": [
       {
@@ -1742,7 +1731,7 @@ namespace MelodicJourney.CLI.Services
   {
     ""Id"": ""13"",
     ""Cover"": ""https://i1.sndcdn.com/artworks-000573445847-q9s6n2-t500x500.jpg"",
-    ""Name"": ""Collin - Switch Back (Original Mix).mp3"",
+    ""Name"": ""Collin - Switch Back (Original Mix)"",
     ""Artists"": ""Collin"",
     ""Genre"": ""EDM"",
     ""Link"": ""Collin - Switch Back (Original Mix).mp3"",
@@ -1761,7 +1750,7 @@ namespace MelodicJourney.CLI.Services
   {
     ""Id"": ""14"",
     ""Cover"": ""https://i1.sndcdn.com/artworks-000573513563-vasli7-t500x500.jpg"",
-    ""Name"": ""Collin - Father's Love (Original Mix).mp3"",
+    ""Name"": ""Collin - Father's Love (Original Mix)"",
     ""Artists"": ""Collin"",
     ""Genre"": ""EDM"",
     ""Link"": ""Collin - Father's Love (Original Mix).mp3"",
@@ -1780,7 +1769,7 @@ namespace MelodicJourney.CLI.Services
   {
     ""Id"": ""15"",
     ""Cover"": ""https://i1.sndcdn.com/artworks-000573513563-vasli7-t500x500.jpg"",
-    ""Name"": ""Collin - Father's Love (Original Mix).mp3"",
+    ""Name"": ""Collin - Father's Love (Original Mix)"",
     ""Artists"": ""Collin"",
     ""Genre"": ""EDM"",
     ""Link"": ""Collin - Father's Love (Original Mix).mp3"",
@@ -1799,7 +1788,7 @@ namespace MelodicJourney.CLI.Services
   {
     ""Id"": ""16"",
     ""Cover"": ""https://i1.sndcdn.com/artworks-000573434426-0vp8iv-t500x500.jpg"",
-    ""Name"": ""Collin - Last Life (Original Mix).mp3"",
+    ""Name"": ""Collin - Last Life (Original Mix)"",
     ""Artists"": ""Collin"",
     ""Genre"": ""EDM"",
     ""Link"": ""Collin - Last Life (Original Mix).mp3"",
@@ -1818,10 +1807,10 @@ namespace MelodicJourney.CLI.Services
   {
     ""Id"": ""17"",
     ""Cover"": ""https://i1.sndcdn.com/artworks-000573431723-e0rdlu-t500x500.jpg"",
-    ""Name"": ""Collin - Invisible (Original Mix).mp3"",
-    ""Artists"": ""Collin"",
+    ""Name"": ""Colllin - Invisible (Original Mix)"",
+    ""Artists"": ""Colllin"",
     ""Genre"": ""EDM"",
-    ""Link"": ""Collin - Invisible (Original Mix).mp3"",
+    ""Link"": ""Colllin - Invisible (Original Mix).mp3"",
     ""Length"": ""03:30"",
     ""DownloadLinks"": [
       {
@@ -1837,7 +1826,7 @@ namespace MelodicJourney.CLI.Services
   {
     ""Id"": ""18"",
     ""Cover"": ""https://i1.sndcdn.com/artworks-000326532225-arse4v-t500x500.jpg"",
-    ""Name"": ""Sage & Collin - The Sage (VIP Mix).mp3"",
+    ""Name"": ""Sage & Collin - The Sage (VIP Mix)"",
     ""Artists"": ""Sage & Collin"",
     ""Genre"": ""EDM"",
     ""Link"": ""Sage & Collin - The Sage (VIP Mix).mp3"",
@@ -1856,7 +1845,7 @@ namespace MelodicJourney.CLI.Services
   {
     ""Id"": ""19"",
     ""Cover"": ""https://i1.sndcdn.com/artworks-000326529471-t0vvye-t500x500.jpg"",
-    ""Name"": ""Thingyan Moe (The Luminosity x Colllin).mp3"",
+    ""Name"": ""Thingyan Moe (The Luminosity x Colllin)"",
     ""Artists"": ""The Luminosity & Collin"",
     ""Genre"": ""EDM"",
     ""Link"": ""Thingyan Moe (The Luminosity x Colllin).mp3"",
@@ -1875,7 +1864,7 @@ namespace MelodicJourney.CLI.Services
   {
     ""Id"": ""20"",
     ""Cover"": ""https://i1.sndcdn.com/artworks-000326486535-my9ool-t500x500.jpg"",
-    ""Name"": ""Sage x Collin - Imaginations (Original Mix).mp3"",
+    ""Name"": ""Sage x Collin - Imaginations (Original Mix)"",
     ""Artists"": ""Sage & Collin"",
     ""Genre"": ""EDM"",
     ""Link"": ""Sage x Collin - Imaginations (Original Mix).mp3"",
@@ -1894,10 +1883,10 @@ namespace MelodicJourney.CLI.Services
   {
     ""Id"": ""21"",
     ""Cover"": ""https://i1.sndcdn.com/artworks-000326484990-o13ljr-t500x500.jpg"",
-    ""Name"": ""Collin - Nobody Gets Out Alive (Original Mix).mp3"",
-    ""Artists"": ""Collin"",
+    ""Name"": ""Colllin - Nobody Gets Out Alive (Original Mix)"",
+    ""Artists"": ""Colllin"",
     ""Genre"": ""EDM"",
-    ""Link"": ""Collin - Nobody Gets Out Alive (Original Mix).mp3"",
+    ""Link"": ""Colllin - Nobody Gets Out Alive (Original Mix).mp3"",
     ""Length"": ""03:41"",
     ""DownloadLinks"": [
       {
@@ -1913,7 +1902,7 @@ namespace MelodicJourney.CLI.Services
   {
     ""Id"": ""22"",
     ""Cover"": ""https://i1.sndcdn.com/artworks-000326483589-6w6ows-t500x500.jpg"",
-    ""Name"": ""Collin - Senses (Original Mix).mp3"",
+    ""Name"": ""Collin - Senses (Original Mix)"",
     ""Artists"": ""Collin"",
     ""Genre"": ""EDM"",
     ""Link"": ""Collin - Senses (Original Mix).mp3"",
@@ -1932,10 +1921,10 @@ namespace MelodicJourney.CLI.Services
   {
     ""Id"": ""23"",
     ""Cover"": ""https://i1.sndcdn.com/artworks-000247288247-fqo8fk-t500x500.jpg"",
-    ""Name"": ""Electric Twinz (P2 x Collin) - K.O.T.E.M.F (Original Mix) Free Download.mp3"",
-    ""Artists"": ""Electric Twinz (P2 x Collin)"",
+    ""Name"": ""The Huftgold x Colllin - Aparchie"",
+    ""Artists"": ""The Huftgold x Colllin"",
     ""Genre"": ""EDM"",
-    ""Link"": ""Electric Twinz (P2 x Collin) - K.O.T.E.M.F (Original Mix) Free Download.mp3"",
+    ""Link"": ""The Huftgold x Colllin - Aparchie (Original Mix).mp3"",
     ""Length"": ""02:45"",
     ""DownloadLinks"": [
       {
@@ -1951,10 +1940,10 @@ namespace MelodicJourney.CLI.Services
   {
     ""Id"": ""24"",
     ""Cover"": ""https://i1.sndcdn.com/artworks-000226042151-vrzn6o-t500x500.jpg"",
-    ""Name"": ""Kavin & Colllin - Melody Of Angels (Original Mix) Free Download.mp3"",
+    ""Name"": ""Kavin & Colllin - Melody Of Angels"",
     ""Artists"": ""Kavin & Collin"",
     ""Genre"": ""EDM"",
-    ""Link"": ""Kavin & Colllin - Melody Of Angels (Original Mix) Free Download.mp3"",
+    ""Link"": ""Kavin & Colllin - Melody Of Angels (Original Mix).mp3"",
     ""Length"": ""03:18"",
     ""DownloadLinks"": [
       {
@@ -1970,10 +1959,10 @@ namespace MelodicJourney.CLI.Services
   {
     ""Id"": ""25"",
     ""Cover"": ""https://i1.sndcdn.com/artworks-000326532225-arse4v-t500x500.jpg"",
-    ""Name"": ""Kavin & Collin - Sign Of Love (Original Mix).mp3"",
-    ""Artists"": ""Kavin & Collin"",
+    ""Name"": ""K3V!N & Collin - Sign Of Love (Original Mix)"",
+    ""Artists"": ""K3V!N & Collin"",
     ""Genre"": ""EDM"",
-    ""Link"": ""Kavin & Collin - Sign Of Love (Original Mix).mp3"",
+    ""Link"": ""K3V!N & Collin - Sign Of Love (Original Mix).mp3"",
     ""Length"": ""03:14"",
     ""DownloadLinks"": [
       {

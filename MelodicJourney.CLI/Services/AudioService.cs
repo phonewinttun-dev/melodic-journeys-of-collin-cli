@@ -1,5 +1,6 @@
 using NetCoreAudio;
 using MelodicJourney.CLI.Models;
+using System.IO;
 
 namespace MelodicJourney.CLI.Services;
 
@@ -14,6 +15,15 @@ public sealed class AudioService
         if (string.IsNullOrWhiteSpace(track.Link)) return;
 
         // handle local files and urls
+        if (!track.Link.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+        {
+            var fullPath = Path.GetFullPath(track.Link);
+            if (!File.Exists(fullPath))
+            {
+                throw new FileNotFoundException($"Music file not found: {track.Link}\nLooking at: {fullPath}\n\n", fullPath);
+            }
+        }
+
         await _player.Play(track.Link);
         CurrentTrack = track;
         IsPlaying = true;
